@@ -190,13 +190,17 @@ initFilters();resetAndRender();
     rBtn.style.display="block";
     rBtn.onclick=function(){
       rBtn.style.display="none";
+      var w=document.getElementById("wall");
+      if(w) w.style.visibility="hidden";
       var tries=0;
-      var tmr=setInterval(function(){
+      while(document.documentElement.scrollHeight < savedY + 400 && tries < 80){
         tries++;
-        if(typeof window.checkLoadMore==="function") window.checkLoadMore();
-        window.scrollTo({top:savedY,behavior:"smooth"});
-        if(document.documentElement.scrollHeight>=savedY+300 || tries>15) clearInterval(tmr);
-      },120);
+        if(typeof window.appendBatch==="function") window.appendBatch();
+        else if(typeof window.checkLoadMore==="function") window.checkLoadMore();
+        else break;
+      }
+      window.scrollTo(0, savedY);
+      setTimeout(function(){ if(w) w.style.visibility="visible"; }, 50);
     };
   }
   var scTmr=null;
