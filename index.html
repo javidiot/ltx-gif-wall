@@ -212,4 +212,13 @@ initFilters();resetAndRender();
   },{passive:true});
 })();
 </script>
+<script>
+fetch("gif_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
+  if (Array.isArray(d) && d.length > 0) {
+    window.DATA = d;
+    if (typeof initFilters === "function") initFilters();
+    if (typeof resetAndRender === "function") resetAndRender();
+  }
+}).catch(function(){});
+</script>
 </body></html>
