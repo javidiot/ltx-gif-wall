@@ -116,4 +116,96 @@ function appendBatch(){var l=window._curList||[],w=document.getElementById("wall
 function resetAndRender(){var tmp=getFiltered();window._curList=rnd10?tmp.slice(0,10):tmp;renderedCount=0;document.getElementById("wall").innerHTML="";appendBatch();}
 function checkLoadMore(){var s=document.getElementById("sentinel");if(!s)return;if(s.getBoundingClientRect().top<=window.innerHeight+450&&renderedCount<(window._curList||[]).length){appendBatch();}}window.addEventListener("scroll",checkLoadMore,{passive:true});window.addEventListener("resize",checkLoadMore,{passive:true});setInterval(checkLoadMore,400);
 initFilters();resetAndRender();
-</script></body></html>
+</script><style>
+#gifFavIoBar{display:none;gap:8px;justify-content:center;padding:6px 12px;background:rgba(24,24,27,0.9);border-bottom:1px solid #27272a}
+#gifFavIoBar.show{display:flex}
+.gio-btn{background:#27272a;color:#e4e4e7;border:1px solid #3f3f46;border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer}
+#btnGifResume{position:fixed;right:16px;bottom:68px;z-index:60;display:none;background:rgba(24,24,27,0.95);color:#fbbf24;border:1px solid rgba(251,191,36,0.4);border-radius:999px;padding:7px 14px;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,0.5);cursor:pointer}
+</style>
+<button id="btnGifResume">📍 回到上次位置</button>
+<script>
+(function(){
+  var kw=document.getElementById("kw");
+  var hw=document.querySelector(".header-wrap");
+  if(hw){
+    var bar=document.createElement("div");
+    bar.id="gifFavIoBar";
+    bar.innerHTML='<button class="gio-btn" id="btnExpGifFav">📤 匯出收藏</button><button class="gio-btn" id="btnImpGifFav">📥 匯入還原</button>';
+    hw.appendChild(bar);
+  }
+  function syncGifUrl(val){
+    try{
+      var u=new URL(window.location.href);
+      if(val && val.trim()){ u.searchParams.set("q",val.trim()); } else { u.searchParams.delete("q"); }
+      history.replaceState(null,"",u.toString());
+    }catch(e){}
+  }
+  if(kw){
+    var usp=new URLSearchParams(window.location.search);
+    if(usp.get("q")){ kw.value=usp.get("q"); if(typeof resetAndRender==="function") resetAndRender(); }
+    var origKw=kw.oninput;
+    kw.oninput=function(e){ if(origKw)origKw.call(this,e); syncGifUrl(this.value); };
+  }
+  var favBtn=document.getElementById("btnFavs");
+  document.addEventListener("click",function(){
+    setTimeout(function(){
+      var b=document.getElementById("gifFavIoBar");
+      if(b && favBtn) b.classList.toggle("show", favBtn.classList.contains("active")||favBtn.classList.contains("on"));
+    },30);
+  });
+  function findGifFavKey(){
+    for(var i=0;i<localStorage.length;i++){
+      var k=localStorage.key(i);
+      if(/fav|like|star/i.test(k)) return k;
+    }
+    return "gif_favs";
+  }
+  var expB=document.getElementById("btnExpGifFav");
+  if(expB) expB.onclick=function(){
+    var k=findGifFavKey(), raw=localStorage.getItem(k)||"[]";
+    var arr=[]; try{arr=JSON.parse(raw);}catch(e){}
+    if(!Array.isArray(arr)||arr.length===0){ alert("目前收藏清單是空的喔！"); return; }
+    var txt=arr.join("\n");
+    if(navigator.clipboard) navigator.clipboard.writeText(txt);
+    prompt("已複製收藏清單（請全選複製保存）：", txt);
+  };
+  var impB=document.getElementById("btnImpGifFav");
+  if(impB) impB.onclick=function(){
+    var inp=prompt("請貼上之前匯出的收藏清單：");
+    if(!inp) return;
+    var items=inp.split(/[\s,，;；\n]+/).map(function(s){return s.trim();}).filter(Boolean);
+    if(items.length===0) return;
+    var k=findGifFavKey(), cur=[];
+    try{cur=JSON.parse(localStorage.getItem(k)||"[]");}catch(e){}
+    if(!Array.isArray(cur)) cur=[];
+    items.forEach(function(x){ if(cur.indexOf(x)<0) cur.push(x); });
+    localStorage.setItem(k, JSON.stringify(cur));
+    alert("已成功匯入 "+items.length+" 筆，重新整理套用！");
+    location.reload();
+  };
+  var POS_KEY="pikpak_gif_scroll_y";
+  var savedY=parseInt(localStorage.getItem(POS_KEY)||"0",10);
+  var rBtn=document.getElementById("btnGifResume");
+  if(savedY>400 && rBtn){
+    rBtn.style.display="block";
+    rBtn.onclick=function(){
+      rBtn.style.display="none";
+      var tries=0;
+      var tmr=setInterval(function(){
+        tries++;
+        if(typeof window.checkLoadMore==="function") window.checkLoadMore();
+        window.scrollTo({top:savedY,behavior:"smooth"});
+        if(document.documentElement.scrollHeight>=savedY+300 || tries>15) clearInterval(tmr);
+      },120);
+    };
+  }
+  var scTmr=null;
+  window.addEventListener("scroll",function(){
+    clearTimeout(scTmr);
+    scTmr=setTimeout(function(){
+      if(window.scrollY>300) localStorage.setItem(POS_KEY, String(Math.round(window.scrollY)));
+    },300);
+  },{passive:true});
+})();
+</script>
+</body></html>
