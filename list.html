@@ -227,4 +227,105 @@ rendered=end;
 function checkLoadMore(){var m=document.getElementById("more");if(!m)return;if(m.getBoundingClientRect().top<=window.innerHeight+800&&rendered<curList.length){appendCards();}}window.addEventListener("scroll",checkLoadMore,{passive:true});window.addEventListener("resize",checkLoadMore,{passive:true});setInterval(checkLoadMore,350);
 initRecentDates(); initHotChips(); saveFavs(); var usp=new URLSearchParams(window.location.search);if(usp.get("q")){qInput.value=usp.get("q");clrBtn.classList.add("show");}if(usp.get("k")==="4k"){only4k=true;syncFilterBtns();}if(usp.get("m")==="recent"){onlyRecent=true;syncFilterBtns();}
 runFilter();
-</script></body></html>
+</script><style>
+#favIoBar{display:none;gap:8px;justify-content:center;padding:6px 12px;background:rgba(24,24,27,0.9);border-bottom:1px solid #27272a}
+#favIoBar.show{display:flex}
+.io-btn{background:#27272a;color:#e4e4e7;border:1px solid #3f3f46;border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer}
+.io-btn:hover{background:#3f3f46}
+#btnResumePos{position:fixed;right:16px;bottom:68px;z-index:60;display:none;background:rgba(24,24,27,0.95);color:#fbbf24;border:1px solid rgba(251,191,36,0.4);border-radius:999px;padding:7px 14px;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,0.5);cursor:pointer}
+</style>
+<button id="btnResumePos">📍 回到上次位置</button>
+<script>
+(function(){
+  var qEl=document.getElementById("qInput")||document.querySelector("input[type='search'],input[type='text']");
+  var hw=document.querySelector(".header-wrap");
+  if(hw){
+    var bar=document.createElement("div");
+    bar.id="favIoBar";
+    bar.innerHTML='<button class="io-btn" id="btnExpFav">📤 匯出待看清單</button><button class="io-btn" id="btnImpFav">📥 匯入還原</button>';
+    hw.appendChild(bar);
+  }
+  function syncUrlQ(val){
+    try{
+      var u=new URL(window.location.href);
+      if(val && val.trim()){ u.searchParams.set("q",val.trim()); } else { u.searchParams.delete("q"); }
+      history.replaceState(null,"",u.toString());
+    }catch(e){}
+  }
+  if(qEl){
+    var origInput=qEl.oninput;
+    qEl.oninput=function(e){ if(origInput)origInput.call(this,e); syncUrlQ(this.value); };
+    var clr=document.getElementById("clrBtn");
+    if(clr){
+      var origClr=clr.onclick;
+      clr.onclick=function(e){ if(origClr)origClr.call(this,e); syncUrlQ(""); };
+    }
+    var origFilterByText=window.filterByText;
+    if(typeof origFilterByText==="function"){
+      window.filterByText=function(t){ origFilterByText(t); syncUrlQ(t); };
+    }
+  }
+  var favBtn=document.getElementById("btnFav");
+  function toggleIoBar(){
+    var b=document.getElementById("favIoBar");
+    if(b && favBtn) b.classList.toggle("show", favBtn.classList.contains("active")||favBtn.classList.contains("on"));
+  }
+  document.addEventListener("click",function(e){
+    if(e.target && e.target.closest && e.target.closest(".btn")) setTimeout(toggleIoBar,30);
+  });
+  function findFavKey(){
+    for(var i=0;i<localStorage.length;i++){
+      var k=localStorage.key(i);
+      if(/fav|watch|like|star/i.test(k)) return k;
+    }
+    return "pikpak_favs";
+  }
+  var expBtn=document.getElementById("btnExpFav");
+  if(expBtn) expBtn.onclick=function(){
+    var k=findFavKey(), raw=localStorage.getItem(k)||"[]";
+    var arr=[]; try{arr=JSON.parse(raw);}catch(e){}
+    if(!Array.isArray(arr)||arr.length===0){ alert("目前待看清單是空的喔！"); return; }
+    var txt=arr.join(", ");
+    if(navigator.clipboard) navigator.clipboard.writeText(txt);
+    prompt("已複製以下待看番號（請全選複製保存）：", txt);
+  };
+  var impBtn=document.getElementById("btnImpFav");
+  if(impBtn) impBtn.onclick=function(){
+    var inp=prompt("請貼上之前匯出的待看番號（以逗號或空白分隔）：");
+    if(!inp) return;
+    var items=inp.split(/[\s,，;；\n]+/).map(function(s){return s.trim();}).filter(Boolean);
+    if(items.length===0) return;
+    var k=findFavKey(), cur=[];
+    try{cur=JSON.parse(localStorage.getItem(k)||"[]");}catch(e){}
+    if(!Array.isArray(cur)) cur=[];
+    items.forEach(function(x){ if(cur.indexOf(x)<0) cur.push(x); });
+    localStorage.setItem(k, JSON.stringify(cur));
+    alert("已成功匯入 "+items.length+" 筆，重新整理套用！");
+    location.reload();
+  };
+  var POS_KEY="pikpak_list_scroll_y";
+  var savedY=parseInt(localStorage.getItem(POS_KEY)||"0",10);
+  var rBtn=document.getElementById("btnResumePos");
+  if(savedY>400 && rBtn){
+    rBtn.style.display="block";
+    rBtn.onclick=function(){
+      rBtn.style.display="none";
+      var tries=0;
+      var tmr=setInterval(function(){
+        tries++;
+        if(typeof window.checkLoadMore==="function") window.checkLoadMore();
+        window.scrollTo({top:savedY,behavior:"smooth"});
+        if(document.documentElement.scrollHeight>=savedY+300 || tries>15) clearInterval(tmr);
+      },120);
+    };
+  }
+  var scTmr=null;
+  window.addEventListener("scroll",function(){
+    clearTimeout(scTmr);
+    scTmr=setTimeout(function(){
+      if(window.scrollY>300) localStorage.setItem(POS_KEY, String(Math.round(window.scrollY)));
+    },300);
+  },{passive:true});
+})();
+</script>
+</body></html>
