@@ -222,7 +222,7 @@ g.appendChild(c);
 }
 rendered=end;
 }
-new IntersectionObserver(function(es){ if(es.isIntersecting)appendCards(); },{rootMargin:"500px"}).observe(document.getElementById("more"));
+function checkLoadMore(){var m=document.getElementById("more");if(!m)return;if(m.getBoundingClientRect().top<=window.innerHeight+800&&rendered<curList.length){appendCards();}}window.addEventListener("scroll",checkLoadMore,{passive:true});window.addEventListener("resize",checkLoadMore,{passive:true});setInterval(checkLoadMore,350);
 initRecentDates(); initHotChips(); saveFavs(); var usp=new URLSearchParams(window.location.search);if(usp.get("q")){qInput.value=usp.get("q");clrBtn.classList.add("show");}if(usp.get("k")==="4k"){only4k=true;syncFilterBtns();}if(usp.get("m")==="recent"){onlyRecent=true;syncFilterBtns();}
 runFilter();
 </script></body></html>
