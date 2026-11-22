@@ -1,0 +1,121 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="referrer" content="no-referrer"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://na.cx" crossorigin><title>🎞️ 動態預覽牆 (PW: ltxxx)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;overflow-x:hidden;}
+@keyframes pulse{0%,100%{background-color:#16161c;}50%{background-color:#22222b;}}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(9,9,11,0.94);backdrop-filter:blur(10px);padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.08);flex-wrap:wrap;}
+.search{background:#18181b;border:1px solid #27272a;color:#fff;padding:5px 12px;border-radius:99px;font-size:12px;width:165px;outline:none;transition:border-color .2s;}
+.search:focus{border-color:#ec4899;}
+.pill,.icon-btn,.date-sel{background:#18181b;color:#d4d4d8;border:1px solid #27272a;padding:4px 10px;border-radius:99px;font-size:12px;cursor:pointer;outline:none;white-space:nowrap;}
+.pill.active,.pill:hover,.icon-btn:hover{background:#be185d;color:#fff;border-color:#be185d;}
+.date-sel:focus{border-color:#ec4899;}
+.pw{margin-left:auto;font-size:12px;color:#f472b6;background:rgba(190,24,93,0.18);border:1px solid rgba(244,114,182,0.3);padding:4px 10px;border-radius:99px;cursor:pointer;font-weight:600;transition:all .2s;}
+.pw:hover{background:#be185d;color:#fff;}
+.masonry{column-count:4;column-gap:5px;padding:5px;}@media(max-width:1100px){.masonry{column-count:3;}}@media(max-width:680px){.masonry{column-count:2;}}
+.masonry.cols-1{column-count:1 !important;max-width:720px;margin:0 auto;}.masonry.cols-2{column-count:2 !important;}.masonry.cols-5{column-count:5 !important;}
+.item{break-inside:avoid;margin-bottom:5px;position:relative;border-radius:6px;overflow:hidden;background:#16161c;min-height:150px;cursor:zoom-in;animation:pulse 1.6s infinite ease-in-out;}
+.item.loaded{min-height:auto;animation:none;}.item img{width:100%;height:auto;display:block;}
+.overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.8) 0%,transparent 40%);opacity:0;transition:opacity .15s;pointer-events:none;display:flex;align-items:flex-end;padding:8px;}
+.item:hover .overlay{opacity:1;}.cap{font-size:11px;color:#e4e4e7;}
+.top-btn{position:fixed;right:16px;bottom:20px;z-index:60;width:40px;height:40px;border-radius:50%;background:rgba(190,24,93,0.88);color:#fff;border:1px solid rgba(255,255,255,0.2);font-size:18px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,0.6);transition:transform .2s;}
+.top-btn.show{display:flex;}.top-btn:hover{transform:scale(1.1);background:#db2777;}
+.lb{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.94);display:none;flex-direction:column;align-items:center;justify-content:center;padding:12px;user-select:none;}
+.lb.show{display:flex;}.lb img{max-width:95vw;max-height:80vh;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.85);}
+.lb-bar{margin-top:12px;display:flex;align-items:center;gap:12px;font-size:13px;color:#d4d4d8;flex-wrap:wrap;justify-content:center;}
+.lb-link{background:#be185d;color:#fff;text-decoration:none;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:600;}
+.lb-link:hover{background:#db2777;}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);color:#fff;border:none;width:40px;height:60px;border-radius:8px;font-size:20px;cursor:pointer;z-index:105;}
+.nav-btn:hover{background:rgba(236,72,153,0.7);}.nav-prev{left:8px;}.nav-next{right:8px;}
+</style></head><body>
+<div class="topbar">
+  <input class="search" id="kw" placeholder="🔍 搜女優 / 番號 / 日期...">
+  <button class="icon-btn" id="btnShuffle" title="隨機洗牌">🎲</button>
+  <button class="icon-btn" id="btnCols" title="切換單排/多排">⊞</button>
+  <button class="pill active" id="btnAll">全部</button>
+  <button class="pill" id="btnRecent">🆕 最新 3 日</button>
+  <select class="date-sel" id="dateSel"><option value="">📅 依日期篩選...</option></select>
+  <a class="icon-btn" href="https://google.com" target="_blank" style="text-decoration:none;">📊 總表</a>
+  <button class="pw" id="btnCopyPw" title="點擊複製密碼">🔑 ltxxx (0)</button>
+</div>
+<div class="masonry" id="wall"></div><div id="sentinel" style="height:30px;"></div>
+<button class="top-btn" id="btnTop" title="回到頂部">↑</button>
+<div class="lb" id="lb">
+  <button class="nav-btn nav-prev" id="btnPrev">‹</button><img id="lb-img" referrerpolicy="no-referrer" src=""><button class="nav-btn nav-next" id="btnNext">›</button>
+  <div class="lb-bar"><span id="lb-txt"></span><a class="lb-link" id="lb-link" href="#" target="_blank">📂 開啟 PikPak 資料夾</a></div>
+</div>
+<script>
+var DATA = [], filterMode = "all", curDate = "", recentDates = [], curIdx = 0, renderedCount = 0, colMode = 0, BATCH = 18;
+function initFilters(){
+  var seen = {}, dates = [];
+  for(var i=0;i<DATA.length;i++){ var d=DATA[i].date; if(d){ if(!seen[d]){ seen[d]=0; dates.push(d); } seen[d]++; } }
+  dates.sort().reverse(); recentDates = dates.slice(0, 3);
+  var sel = document.getElementById("dateSel");
+  for(var j=0;j<dates.length;j++){ var opt=document.createElement("option"); opt.value=dates[j]; opt.textContent=dates[j] + " (" + seen[dates[j]] + " 張)"; sel.appendChild(opt); }
+  document.getElementById("btnCopyPw").textContent = "🔑 ltxxx (" + DATA.length + ")";
+}
+function setFilterUI(mode, dVal){
+  filterMode = mode; curDate = dVal || "";
+  document.getElementById("btnAll").className = "pill" + (mode==="all"?" active":"");
+  document.getElementById("btnRecent").className = "pill" + (mode==="recent"?" active":"");
+  if(mode !== "date") document.getElementById("dateSel").value = "";
+  resetAndRender();
+}
+document.getElementById("btnAll").onclick = function(){ setFilterUI("all", ""); };
+document.getElementById("btnRecent").onclick = function(){ setFilterUI("recent", ""); };
+document.getElementById("dateSel").onchange = function(){ if(this.value) setFilterUI("date", this.value); else setFilterUI("all", ""); };
+document.getElementById("kw").oninput = function(){ resetAndRender(); };
+document.getElementById("btnCopyPw").onclick = function(){
+  var btn = this;
+  if(navigator.clipboard){ navigator.clipboard.writeText("ltxxx").then(function(){ var orig=btn.textContent; btn.textContent="✅ 已複製 ltxxx"; setTimeout(function(){ btn.textContent=orig; }, 1500); }); }
+};
+document.getElementById("btnShuffle").onclick = function(){ for(var i=DATA.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=DATA[i]; DATA[i]=DATA[j]; DATA[j]=t; } resetAndRender(); };
+document.getElementById("btnCols").onclick = function(){ var w=document.getElementById("wall"); colMode=(colMode+1)%4; w.className="masonry"+(colMode===1?" cols-1":colMode===2?" cols-2":colMode===3?" cols-5":""); };
+var topBtn = document.getElementById("btnTop");
+window.addEventListener("scroll", function(){ if(window.scrollY > 400) topBtn.classList.add("show"); else topBtn.classList.remove("show"); }, {passive:true});
+topBtn.onclick = function(){ window.scrollTo({top: 0, behavior: "smooth"}); };
+function openLb(idx){ curIdx = idx; showLb(); }
+function showLb(){
+  var list=window._curList; if(!list||!list.length) return;
+  if(curIdx<0) curIdx=list.length-1; if(curIdx>=list.length) curIdx=0;
+  var it=list[curIdx]; document.getElementById("lb-img").src=it.url;
+  document.getElementById("lb-txt").textContent=(curIdx+1)+"/"+list.length+" · "+(it.title||it.date||"");
+  var lnk=document.getElementById("lb-link"); lnk.href=it.link||"#"; lnk.style.display=it.link?"inline-block":"none";
+  document.getElementById("lb").classList.add("show");
+}
+document.getElementById("btnPrev").onclick=function(e){e.stopPropagation();curIdx--;showLb();};
+document.getElementById("btnNext").onclick=function(e){e.stopPropagation();curIdx++;showLb();};
+document.getElementById("lb").onclick=function(e){if(e.target.id==="lb")this.classList.remove("show");};
+document.addEventListener("keydown",function(e){if(!document.getElementById("lb").classList.contains("show"))return;if(e.key==="Escape")document.getElementById("lb").classList.remove("show");if(e.key==="ArrowLeft"){curIdx--;showLb();}if(e.key==="ArrowRight"){curIdx++;showLb();}});
+function getFiltered(){
+  var q=(document.getElementById("kw").value||"").trim().toLowerCase();
+  return DATA.filter(function(it){
+    if(filterMode==="recent" && recentDates.indexOf(it.date)===-1) return false;
+    if(filterMode==="date" && it.date!==curDate) return false;
+    if(q && ((it.title||"").toLowerCase().indexOf(q)===-1 && (it.date||"").indexOf(q)===-1)) return false;
+    return true;
+  });
+}
+function appendBatch(){
+  var list=window._curList||[], wall=document.getElementById("wall"), end=Math.min(renderedCount+BATCH, list.length);
+  for(var i=renderedCount;i<end;i++){
+    (function(idx, it){
+      var d=document.createElement("div"); d.className="item";
+      var img=document.createElement("img"); img.loading="lazy"; img.referrerPolicy="no-referrer"; img.src=it.url;
+      img.onload=function(){ d.classList.add("loaded"); };
+      var ov=document.createElement("div"); ov.className="overlay";
+      var sp=document.createElement("span"); sp.className="cap"; sp.textContent=it.title||it.date||"";
+      ov.appendChild(sp); d.appendChild(img); d.appendChild(ov);
+      d.onclick=function(){ openLb(idx); };
+      wall.appendChild(d);
+    })(i, list[i]);
+  }
+  renderedCount=end;
+}
+function resetAndRender(){
+  window._curList=getFiltered(); renderedCount=0;
+  document.getElementById("wall").innerHTML="";
+  appendBatch();
+}
+new IntersectionObserver(function(es){ if(es.isIntersecting) appendBatch(); }, {rootMargin:"600px"}).observe(document.getElementById("sentinel"));
+fetch("./gifs.json?t=" + Date.now()).then(function(r){ return r.json(); }).then(function(arr){ DATA=arr; initFilters(); resetAndRender(); });
