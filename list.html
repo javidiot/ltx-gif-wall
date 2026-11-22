@@ -310,13 +310,17 @@ runFilter();
     rBtn.style.display="block";
     rBtn.onclick=function(){
       rBtn.style.display="none";
+      var g=document.getElementById("grid");
+      if(g) g.style.visibility="hidden";
       var tries=0;
-      var tmr=setInterval(function(){
+      while(document.documentElement.scrollHeight < savedY + 400 && tries < 60){
         tries++;
-        if(typeof window.checkLoadMore==="function") window.checkLoadMore();
-        window.scrollTo({top:savedY,behavior:"smooth"});
-        if(document.documentElement.scrollHeight>=savedY+300 || tries>15) clearInterval(tmr);
-      },120);
+        if(typeof window.appendCards==="function") window.appendCards();
+        else if(typeof window.checkLoadMore==="function") window.checkLoadMore();
+        else break;
+      }
+      window.scrollTo(0, savedY);
+      setTimeout(function(){ if(g) g.style.visibility="visible"; }, 50);
     };
   }
   var scTmr=null;
