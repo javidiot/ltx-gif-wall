@@ -66,6 +66,7 @@ body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFo
 var DATA = JSON.parse(document.getElementById('gif-data').textContent);
 var filterMode='all',curDate='',recentDates=[],curIdx=0,renderedCount=0,colMode=0,BATCH=18,playTimer=null,touchStartX=0;
 var FAV_KEY='ltx_gif_favs_v1',favMap={};try{favMap=JSON.parse(localStorage.getItem(FAV_KEY)||'{}')||{};}catch(e){favMap={};}
+function saveFavs(){try{localStorage.setItem(FAV_KEY,JSON.stringify(favMap));}catch(e){}updateFavCountUI();}function isFaved(u){return !!favMap[u];}function toggleFav(u){if(!u)return;if(favMap[u])delete favMap[u];else favMap[u]=1;saveFavs();}function updateFavCountUI(){var c=0;for(var i=0;i<DATA.length;i++)if(favMap[DATA[i].url])c++;document.getElementById("btnFavs").textContent="❤️ 收藏 ("+c+")";}
 function initFilters(){
   var seen={},dates=[];
   for(var i=0;i<DATA.length;i++){var d=DATA[i].date;if(d){if(!seen[d]){seen[d]=0;dates.push(d);}seen[d]++;}}
