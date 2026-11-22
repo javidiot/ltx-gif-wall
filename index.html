@@ -3,51 +3,42 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#09090b">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://w3.org viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://w3.org viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23be185d%22/><text x=%2250%22 y=%2274%22 font-size=%2262%22 text-anchor=%22middle%22>🎞️</text></svg>">
 <link rel="preconnect" href="https://na.cx" crossorigin><title>🎞️ GIF預覽 (PW: ltxxx)</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom);}
+body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;overflow-x:hidden;}
 @keyframes pulse{0%,100%{background-color:#16161c;}50%{background-color:#22222b;}}
-.header-wrap{position:sticky;top:0;z-index:50;background:rgba(9,9,11,0.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.08);padding-top:env(safe-area-inset-top);}
+.header-wrap{position:sticky;top:0;z-index:50;background:rgba(9,9,11,0.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.08);}
 .topbar{padding:8px 12px 4px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
-.search{background:#18181b;border:1px solid #27272a;color:#fff;padding:5px 12px;border-radius:99px;font-size:12px;width:150px;outline:none;transition:border-color .2s;}
+.search{background:#18181b;border:1px solid #27272a;color:#fff;padding:5px 12px;border-radius:99px;font-size:12px;width:150px;outline:none;}
 .search:focus{border-color:#ec4899;}
-.pill,.icon-btn,.date-sel{background:#18181b;color:#d4d4d8;border:1px solid #27272a;padding:4px 10px;border-radius:99px;font-size:12px;cursor:pointer;outline:none;white-space:nowrap;transition:all .15s;}
+.pill,.icon-btn,.date-sel{background:#18181b;color:#d4d4d8;border:1px solid #27272a;padding:4px 10px;border-radius:99px;font-size:12px;cursor:pointer;outline:none;white-space:nowrap;}
 .pill.active,.pill:hover,.icon-btn:hover{background:#be185d;color:#fff;border-color:#be185d;}
 .pill.fav-pill.active{background:#e11d48;border-color:#e11d48;color:#fff;}
-.date-sel:focus{border-color:#ec4899;}
-.pw{margin-left:auto;font-size:12px;color:#f472b6;background:rgba(190,24,93,0.18);border:1px solid rgba(244,114,182,0.3);padding:4px 10px;border-radius:99px;cursor:pointer;font-weight:600;transition:all .2s;}
-.pw:hover{background:#be185d;color:#fff;}
-.chip-bar{display:flex;align-items:center;gap:6px;padding:4px 12px 8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.pw{margin-left:auto;font-size:12px;color:#f472b6;background:rgba(190,24,93,0.18);border:1px solid rgba(244,114,182,0.3);padding:4px 10px;border-radius:99px;cursor:pointer;font-weight:600;}
+.chip-bar{display:flex;align-items:center;gap:6px;padding:4px 12px 8px;overflow-x:auto;scrollbar-width:none;}
 .chip-bar::-webkit-scrollbar{display:none;}
-.chip{background:#141417;color:#a1a1aa;border:1px solid #27272a;padding:3px 10px;border-radius:99px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+.chip{background:#141417;color:#a1a1aa;border:1px solid #27272a;padding:3px 10px;border-radius:99px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
 .chip.active,.chip:hover{background:rgba(190,24,93,0.28);color:#f472b6;border-color:#be185d;font-weight:600;}
 .masonry{column-count:4;column-gap:5px;padding:5px;}@media(max-width:1100px){.masonry{column-count:3;}}@media(max-width:680px){.masonry{column-count:2;}}
 .masonry.cols-1{column-count:1 !important;max-width:720px;margin:0 auto;}.masonry.cols-2{column-count:2 !important;}.masonry.cols-5{column-count:5 !important;}
 .item{break-inside:avoid;margin-bottom:5px;position:relative;border-radius:6px;overflow:hidden;background:#16161c;min-height:150px;cursor:zoom-in;animation:pulse 1.6s infinite ease-in-out;}
 .item.loaded{min-height:auto;animation:none;}.item img{width:100%;height:auto;display:block;}
-.fav-btn{position:absolute;top:6px;right:6px;z-index:10;width:28px;height:28px;border-radius:50%;background:rgba(9,9,11,0.58);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0.85;transition:transform .15s,background .15s;}
-.fav-btn:hover{transform:scale(1.15);background:rgba(190,24,93,0.85);opacity:1;}
-.fav-btn.faved{background:rgba(225,29,72,0.88);border-color:#fb7185;opacity:1;}
+.fav-btn{position:absolute;top:6px;right:6px;z-index:10;width:28px;height:28px;border-radius:50%;background:rgba(9,9,11,0.6);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.fav-btn.faved{background:rgba(225,29,72,0.88);border-color:#fb7185;}
 .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.8) 0%,transparent 40%);opacity:0;transition:opacity .15s;pointer-events:none;display:flex;align-items:flex-end;padding:8px;}
 .item:hover .overlay{opacity:1;}.cap{font-size:11px;color:#e4e4e7;}
-.empty-tip{text-align:center;padding:60px 20px;color:#71717a;font-size:14px;}
-.top-btn{position:fixed;right:16px;bottom:20px;z-index:60;width:40px;height:40px;border-radius:50%;background:rgba(190,24,93,0.88);color:#fff;border:1px solid rgba(255,255,255,0.2);font-size:18px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,0.6);transition:transform .2s;}
-.top-btn.show{display:flex;}.top-btn:hover{transform:scale(1.1);background:#db2777;}
+.top-btn{position:fixed;right:16px;bottom:20px;z-index:60;width:40px;height:40px;border-radius:50%;background:rgba(190,24,93,0.88);color:#fff;border:1px solid rgba(255,255,255,0.2);font-size:18px;cursor:pointer;display:none;align-items:center;justify-content:center;}
+.top-btn.show{display:flex;}
 .lb{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.95);display:none;flex-direction:column;align-items:center;justify-content:center;padding:12px;user-select:none;touch-action:pan-y;}
-.lb.show{display:flex;}.lb img{max-width:95vw;max-height:78vh;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.85);transition:transform .15s ease;}
+.lb.show{display:flex;}.lb img{max-width:95vw;max-height:78vh;border-radius:8px;}
 .lb-bar{margin-top:12px;display:flex;align-items:center;gap:10px;font-size:13px;color:#d4d4d8;flex-wrap:wrap;justify-content:center;}
 .lb-btn{background:#27272a;color:#f4f4f5;border:1px solid #3f3f46;padding:4px 12px;border-radius:99px;font-size:12px;cursor:pointer;font-weight:600;}
-.lb-btn.playing{background:#10b981;color:#fff;border-color:#10b981;}
-.lb-btn.faved{background:#e11d48;color:#fff;border-color:#fb7185;}
+.lb-btn.playing{background:#10b981;color:#fff;border-color:#10b981;}.lb-btn.faved{background:#e11d48;color:#fff;border-color:#fb7185;}
 .lb-link{background:#be185d;color:#fff;text-decoration:none;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:600;}
-.lb-link:hover{background:#db2777;}
 .nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);color:#fff;border:none;width:40px;height:60px;border-radius:8px;font-size:20px;cursor:pointer;z-index:105;}
-.nav-btn:hover{background:rgba(236,72,153,0.7);}.nav-prev{left:8px;}.nav-next{right:8px;}
+.nav-prev{left:8px;}.nav-next{right:8px;}
 </style></head><body>
 <div class="header-wrap">
   <div class="topbar">
@@ -58,188 +49,68 @@ body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFo
     <button class="pill" id="btnRecent">🆕 最新 3 日</button>
     <button class="pill fav-pill" id="btnFavs">❤️ 收藏 (0)</button>
     <select class="date-sel" id="dateSel"><option value="">📅 全部日期...</option></select>
-    <a class="icon-btn" href="https://google.com" target="_blank" style="text-decoration:none;">📊 總表</a><a class="icon-btn" href="./list.html" style="text-decoration:none;background:#1e1b4b;border-color:#4338ca;color:#c7d2fe;">📋 網頁版目錄</a>
-    <button class="pw" id="btnCopyPw" title="點擊複製密碼">🔑 ltxxx (0)</button>
+    <a class="icon-btn" href="https://google.com" target="_blank" style="text-decoration:none;">📊 總表</a>
+    <a class="icon-btn" href="./list.html" style="text-decoration:none;background:#1e1b4b;border-color:#4338ca;color:#c7d2fe;">📋 網頁版目錄</a>
+    <button class="pw" id="btnCopyPw">🔑 ltxxx (0)</button>
   </div>
   <div class="chip-bar" id="chipBar"></div>
 </div>
 <div class="masonry" id="wall"></div><div id="sentinel" style="height:30px;"></div>
-<button class="top-btn" id="btnTop" title="回到頂部">↑</button>
+<button class="top-btn" id="btnTop">↑</button>
 <div class="lb" id="lb">
   <button class="nav-btn nav-prev" id="btnPrev">‹</button><img id="lb-img" referrerpolicy="no-referrer" src=""><button class="nav-btn nav-next" id="btnNext">›</button>
-  <div class="lb-bar">
-    <span id="lb-txt"></span>
-    <button class="lb-btn" id="btnLbFav">🤍 收藏</button>
-    <button class="lb-btn" id="btnAutoPlay">▶️ 自動輪播</button>
-    <a class="lb-link" id="lb-link" href="#" target="_blank">📂 開啟 PikPak 資料夾</a>
-  </div>
+  <div class="lb-bar"><span id="lb-txt"></span><button class="lb-btn" id="btnLbFav">🤍 收藏</button><button class="lb-btn" id="btnAutoPlay">▶️ 自動輪播</button><a class="lb-link" id="lb-link" href="#" target="_blank">📂 開啟 PikPak 資料夾</a></div>
 </div>
 <script>
 var DATA = [{"url":"https://na.cx/i/c5nBOGA.gif","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/R7jAjOL.gif","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/cLiUAnc.gif","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/nSGOEOH.webp","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/Dg4MrBx.webp","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/aMSqG1N.gif","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/oETA4eX.webp","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/2jcx6tj.webp","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/OyQWOHG.gif","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/GxOA4fQ.gif","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/HVCKc8N.webp","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/6ZaotHU.gif","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/KCtQS4t.gif","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/uZwnKok.gif","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/NxTxm2F.gif","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/Ka63tGT.gif","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/H0odQWa.gif","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/79v4c8Y.webp","title":"26-11-21","link":"https://mypikpak.com","date":"2026-11-21"},{"url":"https://na.cx/i/Dn7qyTQ.webp","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/OHsVbG5.gif","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/3KRrikZ.gif","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/791VV82.webp","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/sn0WFzR.gif","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/k39sNfx.gif","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/t4KknNr.gif","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/KGJtwGb.gif","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/wPtAV7M.webp","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/PM85yTZ.webp","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/2xjAbGg.webp","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/Rw5okzd.gif","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/v1vvK0O.webp","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/JNX90zn.gif","title":"26-11-20","link":"https://mypikpak.com","date":"2026-11-20"},{"url":"https://na.cx/i/LQwyz0C.gif","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/BZEHtki.gif","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/QPMOoT6.webp","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/YV8UjsC.webp","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/qVy1JTA.gif","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/hskb57o.gif","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/nq4z3Ud.gif","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/GHX9SMO.gif","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/g8avCep.gif","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/iwTEvyU.webp","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/VkKwmFq.gif","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/Dc5zjqF.gif","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/K4dMU0P.webp","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/40kLq72.gif","title":"26-11-19","link":"https://mypikpak.com","date":"2026-11-19"},{"url":"https://na.cx/i/QqRB9fx.webp","title":"26-11-18","link":"https://mypikpak.com","date":"2026-11-18"},{"url":"https://na.cx/i/6xWiC9f.gif","title":"26-11-18","link":"https://mypikpak.com","date":"2026-11-18"},{"url":"https://na.cx/i/qDsNwuu.webp","title":"26-11-18","link":"https://mypikpak.com","date":"2026-11-18"},{"url":"https://na.cx/i/ifO80np.gif","title":"26-11-18","link":"https://mypikpak.com","date":"2026-11-18"},{"url":"https://na.cx/i/A5owX8G.gif","title":"26-11-18","link":"https://mypikpak.com","date":"2026-11-18"},{"url":"https://na.cx/i/wPZswve.gif","title":"26-11-18","link":"https://mypikpak.com","date":"2026-11-18"},{"url":"https://na.cx/i/Vfs9KPW.gif","title":"26-11-18","link":"https://mypikpak.com","date":"2026-11-18"},{"url":"https://na.cx/i/HMnaufg.gif","title":"26-11-18","link":"https://mypikpak.com","date":"2026-11-18"},{"url":"https://na.cx/i/bxEj618.gif","title":"26-11-18","link":"https://mypikpak.com","date":"2026-11-18"},{"url":"https://na.cx/i/siDAFm3.webp","title":"26-11-18","link":"https://mypikpak.com","date":"2026-11-18"},{"url":"https://na.cx/i/Rcg6M1N.webp","title":"26-11-18","link":"https://mypikpak.com","date":"2026-11-18"},{"url":"https://na.cx/i/vBO1AWc.gif","title":"26-11-18","link":"https://mypikpak.com","date":"2026-11-18"},{"url":"https://na.cx/i/vRJ490y.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/GyjsokG.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/gp5CLzu.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/SWjoF79.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/ibrN7Op.webp","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/6DJwP0S.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/sMV7okL.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/FiJ8Se2.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/xe3491f.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/AKywP4j.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/LbWKqyj.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/DJXp91A.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/whQrDTS.webp","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/qZOEesF.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/av3kJpT.gif","title":"26-11-17","link":"https://mypikpak.com","date":"2026-11-17"},{"url":"https://na.cx/i/7o7hCy5.gif","title":"26-11-16","link":"https://mypikpak.com","date":"2026-11-16"},{"url":"https://na.cx/i/eU4ox7h.gif","title":"26-11-16","link":"https://mypikpak.com","date":"2026-11-16"},{"url":"https://na.cx/i/5Y6Y6ss.webp","title":"26-11-16","link":"https://mypikpak.com","date":"2026-11-16"},{"url":"https://na.cx/i/NygFAki.webp","title":"26-11-16","link":"https://mypikpak.com","date":"2026-11-16"},{"url":"https://na.cx/i/JpPf8Fd.webp","title":"26-11-16","link":"https://mypikpak.com","date":"2026-11-16"},{"url":"https://na.cx/i/HUtgS7d.gif","title":"26-11-16","link":"https://mypikpak.com","date":"2026-11-16"},{"url":"https://na.cx/i/NNOApdP.webp","title":"26-11-16","link":"https://mypikpak.com","date":"2026-11-16"},{"url":"https://na.cx/i/AYzzEM1.gif","title":"26-11-16","link":"https://mypikpak.com","date":"2026-11-16"},{"url":"https://na.cx/i/U6ki6rQ.gif","title":"26-11-16","link":"https://mypikpak.com","date":"2026-11-16"},{"url":"https://na.cx/i/EdEPtEY.gif","title":"26-11-16","link":"https://mypikpak.com","date":"2026-11-16"},{"url":"https://na.cx/i/2ST8Bg7.webp","title":"26-11-15","link":"https://mypikpak.com","date":"2026-11-15"},{"url":"https://na.cx/i/sDHhuBU.gif","title":"26-11-15","link":"https://mypikpak.com","date":"2026-11-15"},{"url":"https://na.cx/i/ZeE0so9.webp","title":"26-11-15","link":"https://mypikpak.com","date":"2026-11-15"},{"url":"https://na.cx/i/T7XdNoF.gif","title":"26-11-15","link":"https://mypikpak.com","date":"2026-11-15"},{"url":"https://na.cx/i/OAUoqbc.gif","title":"26-11-15","link":"https://mypikpak.com","date":"2026-11-15"},{"url":"https://na.cx/i/K2aiYwg.gif","title":"26-11-15","link":"https://mypikpak.com","date":"2026-11-15"},{"url":"https://na.cx/i/ibPW1aN.gif","title":"26-11-15","link":"https://mypikpak.com","date":"2026-11-15"},{"url":"https://na.cx/i/jDTHFKg.gif","title":"26-11-15","link":"https://mypikpak.com","date":"2026-11-15"},{"url":"https://na.cx/i/5TstBg4.gif","title":"26-11-15","link":"https://mypikpak.com","date":"2026-11-15"},{"url":"https://na.cx/i/Aos5DvF.gif","title":"26-11-15","link":"https://mypikpak.com","date":"2026-11-15"},{"url":"https://na.cx/i/vOMBCdy.gif","title":"26-11-14","link":"https://mypikpak.com","date":"2026-11-14"},{"url":"https://na.cx/i/AQc1OjC.webp","title":"26-11-14","link":"https://mypikpak.com","date":"2026-11-14"},{"url":"https://na.cx/i/5wcASLP.gif","title":"26-11-14","link":"https://mypikpak.com","date":"2026-11-14"},{"url":"https://na.cx/i/efsQGEk.gif","title":"26-11-14","link":"https://mypikpak.com","date":"2026-11-14"},{"url":"https://na.cx/i/nMfZzZ1.webp","title":"26-11-14","link":"https://mypikpak.com","date":"2026-11-14"},{"url":"https://na.cx/i/dU0ZzWO.gif","title":"26-11-14","link":"https://mypikpak.com","date":"2026-11-14"},{"url":"https://na.cx/i/sw8MeZr.gif","title":"26-11-14","link":"https://mypikpak.com","date":"2026-11-14"},{"url":"https://na.cx/i/zvKvGEK.gif","title":"26-11-14","link":"https://mypikpak.com","date":"2026-11-14"},{"url":"https://na.cx/i/JDX1Ojz.gif","title":"26-11-14","link":"https://mypikpak.com","date":"2026-11-14"},{"url":"https://na.cx/i/0naVSMP.gif","title":"26-11-14","link":"https://mypikpak.com","date":"2026-11-14"},{"url":"https://na.cx/i/947MZrD.gif","title":"26-11-14","link":"https://mypikpak.com","date":"2026-11-14"},{"url":"https://na.cx/i/mhpb2CJ.gif","title":"26-11-13","link":"https://mypikpak.com","date":"2026-11-13"},{"url":"https://na.cx/i/niujr2z.gif","title":"26-11-13","link":"https://mypikpak.com","date":"2026-11-13"},{"url":"https://na.cx/i/uQfOknH.gif","title":"26-11-13","link":"https://mypikpak.com","date":"2026-11-13"},{"url":"https://na.cx/i/KySMRv9.gif","title":"26-11-13","link":"https://mypikpak.com","date":"2026-11-13"},{"url":"https://na.cx/i/0kvCdKy.webp","title":"26-11-13","link":"https://mypikpak.com","date":"2026-11-13"},{"url":"https://na.cx/i/7CLbh9q.gif","title":"26-11-13","link":"https://mypikpak.com","date":"2026-11-13"},{"url":"https://na.cx/i/5ZCQyJq.gif","title":"26-11-13","link":"https://mypikpak.com","date":"2026-11-13"},{"url":"https://na.cx/i/338PPf9.webp","title":"26-11-13","link":"https://mypikpak.com","date":"2026-11-13"},{"url":"https://na.cx/i/U4Vq676.gif","title":"26-11-13","link":"https://mypikpak.com","date":"2026-11-13"},{"url":"https://na.cx/i/EZPSM77.gif","title":"26-11-13","link":"https://mypikpak.com","date":"2026-11-13"},{"url":"https://na.cx/i/LrtDzA3.webp","title":"26-11-12","link":"https://mypikpak.com","date":"2026-11-12"},{"url":"https://na.cx/i/eLhXP85.gif","title":"26-11-12","link":"https://mypikpak.com","date":"2026-11-12"},{"url":"https://na.cx/i/ZPoj3tM.gif","title":"26-11-12","link":"https://mypikpak.com","date":"2026-11-12"},{"url":"https://na.cx/i/u893LHd.gif","title":"26-11-12","link":"https://mypikpak.com","date":"2026-11-12"},{"url":"https://na.cx/i/UPuvqLq.webp","title":"26-11-12","link":"https://mypikpak.com","date":"2026-11-12"},{"url":"https://na.cx/i/dUO2i2C.webp","title":"26-11-12","link":"https://mypikpak.com","date":"2026-11-12"},{"url":"https://na.cx/i/4nEWmfD.gif","title":"26-11-12","link":"https://mypikpak.com","date":"2026-11-12"},{"url":"https://na.cx/i/XQigmfN.webp","title":"26-11-12","link":"https://mypikpak.com","date":"2026-11-12"},{"url":"https://na.cx/i/ArFZaVE.gif","title":"26-11-11","link":"https://mypikpak.com","date":"2026-11-11"},{"url":"https://na.cx/i/o3aa12o.gif","title":"26-11-11","link":"https://mypikpak.com","date":"2026-11-11"},{"url":"https://na.cx/i/X5k2S9q.gif","title":"26-11-11","link":"https://mypikpak.com","date":"2026-11-11"},{"url":"https://na.cx/i/mE9Wc8O.gif","title":"26-11-11","link":"https://mypikpak.com","date":"2026-11-11"},{"url":"https://na.cx/i/hFzWc8D.gif","title":"26-11-11","link":"https://mypikpak.com","date":"2026-11-11"},{"url":"https://na.cx/i/FA5N4fn.gif","title":"26-11-11","link":"https://mypikpak.com","date":"2026-11-11"},{"url":"https://na.cx/i/uOckEPb.gif","title":"26-11-11","link":"https://mypikpak.com","date":"2026-11-11"},{"url":"https://na.cx/i/mpc8OHe.gif","title":"26-11-11","link":"https://mypikpak.com","date":"2026-11-11"},{"url":"https://na.cx/i/sBDP99h.webp","title":"26-11-11","link":"https://mypikpak.com","date":"2026-11-11"},{"url":"https://na.cx/i/U9hMsjU.webp","title":"26-11-10","link":"https://mypikpak.com","date":"2026-11-10"},{"url":"https://na.cx/i/zrCAkE9.gif","title":"26-11-10","link":"https://mypikpak.com","date":"2026-11-10"},{"url":"https://na.cx/i/tJosbM6.gif","title":"26-11-10","link":"https://mypikpak.com","date":"2026-11-10"},{"url":"https://na.cx/i/cEM5HTa.gif","title":"26-11-10","link":"https://mypikpak.com","date":"2026-11-10"},{"url":"https://na.cx/i/vYqiiqP.gif","title":"26-11-10","link":"https://mypikpak.com","date":"2026-11-10"},{"url":"https://na.cx/i/OaPKYqZ.gif","title":"26-11-10","link":"https://mypikpak.com","date":"2026-11-10"},{"url":"https://na.cx/i/jySMsjG.gif","title":"26-11-10","link":"https://mypikpak.com","date":"2026-11-10"},{"url":"https://na.cx/i/A4d4dZ5.gif","title":"26-11-10","link":"https://mypikpak.com","date":"2026-11-10"},{"url":"https://na.cx/i/FjC8xOc.gif","title":"26-11-09","link":"https://mypikpak.com","date":"2026-11-09"},{"url":"https://na.cx/i/XYNwvAj.gif","title":"26-11-09","link":"https://mypikpak.com","date":"2026-11-09"},{"url":"https://na.cx/i/wjL91GJ.webp","title":"26-11-09","link":"https://mypikpak.com","date":"2026-11-09"},{"url":"https://na.cx/i/5q3WGGi.webp","title":"26-11-09","link":"https://mypikpak.com","date":"2026-11-09"},{"url":"https://na.cx/i/ooyDaCS.gif","title":"26-11-09","link":"https://mypikpak.com","date":"2026-11-09"},{"url":"https://na.cx/i/TwWJmGU.gif","title":"26-11-09","link":"https://mypikpak.com","date":"2026-11-09"},{"url":"https://na.cx/i/93b1SOi.gif","title":"26-11-09","link":"https://mypikpak.com","date":"2026-11-09"},{"url":"https://na.cx/i/8ASPTs3.gif","title":"26-11-08","link":"https://mypikpak.com","date":"2026-11-08"},{"url":"https://na.cx/i/h25ej8C.gif","title":"26-11-08","link":"https://mypikpak.com","date":"2026-11-08"},{"url":"https://na.cx/i/XkY0fHQ.webp","title":"26-11-08","link":"https://mypikpak.com","date":"2026-11-08"},{"url":"https://na.cx/i/CcfRnmM.gif","title":"26-11-08","link":"https://mypikpak.com","date":"2026-11-08"},{"url":"https://na.cx/i/vZZKHnk.webp","title":"26-11-08","link":"https://mypikpak.com","date":"2026-11-08"},{"url":"https://na.cx/i/7yLYMPm.gif","title":"26-11-08","link":"https://mypikpak.com","date":"2026-11-08"},{"url":"https://na.cx/i/pcahUQ3.gif","title":"26-11-07","link":"https://mypikpak.com","date":"2026-11-07"},{"url":"https://na.cx/i/RV8fGvn.gif","title":"26-11-07","link":"https://mypikpak.com","date":"2026-11-07"},{"url":"https://na.cx/i/6WA2mwG.gif","title":"26-11-07","link":"https://mypikpak.com","date":"2026-11-07"},{"url":"https://na.cx/i/mkmEoHU.gif","title":"26-11-07","link":"https://mypikpak.com","date":"2026-11-07"},{"url":"https://na.cx/i/CYibZhU.gif","title":"26-11-07","link":"https://mypikpak.com","date":"2026-11-07"},{"url":"https://na.cx/i/8NQqjkM.gif","title":"26-11-07","link":"https://mypikpak.com","date":"2026-11-07"},{"url":"https://na.cx/i/CUrH5Xb.gif","title":"26-11-07","link":"https://mypikpak.com","date":"2026-11-07"},{"url":"https://na.cx/i/SORQna7.webp","title":"26-11-06","link":"https://mypikpak.com","date":"2026-11-06"},{"url":"https://na.cx/i/HhWT40m.gif","title":"26-11-06","link":"https://mypikpak.com","date":"2026-11-06"},{"url":"https://na.cx/i/ny2W19U.gif","title":"26-11-06","link":"https://mypikpak.com","date":"2026-11-06"},{"url":"https://na.cx/i/tmwHXJM.gif","title":"26-11-06","link":"https://mypikpak.com","date":"2026-11-06"},{"url":"https://na.cx/i/KqwdjWX.gif","title":"26-11-06","link":"https://mypikpak.com","date":"2026-11-06"},{"url":"https://na.cx/i/LKk9CJS.gif","title":"26-11-06","link":"https://mypikpak.com","date":"2026-11-06"},{"url":"https://na.cx/i/n9N0Ko2.gif","title":"26-11-06","link":"https://mypikpak.com","date":"2026-11-06"},{"url":"https://na.cx/i/Z718LbR.webp","title":"26-11-05","link":"https://mypikpak.com","date":"2026-11-05"},{"url":"https://na.cx/i/rq2G49F.gif","title":"26-11-05","link":"https://mypikpak.com","date":"2026-11-05"},{"url":"https://na.cx/i/CEUMZFR.gif","title":"26-11-05","link":"https://mypikpak.com","date":"2026-11-05"},{"url":"https://na.cx/i/2OEutyX.gif","title":"26-11-05","link":"https://mypikpak.com","date":"2026-11-05"},{"url":"https://na.cx/i/sPnG5jj.gif","title":"26-11-05","link":"https://mypikpak.com","date":"2026-11-05"},{"url":"https://na.cx/i/GDJvd3t.gif","title":"26-11-05","link":"https://mypikpak.com","date":"2026-11-05"},{"url":"https://na.cx/i/e9kQYup.gif","title":"26-11-05","link":"https://mypikpak.com","date":"2026-11-05"},{"url":"https://na.cx/i/4CzY7oc.gif","title":"26-11-05","link":"https://mypikpak.com","date":"2026-11-05"},{"url":"https://na.cx/i/UPCcsoV.gif","title":"26-11-05","link":"https://mypikpak.com","date":"2026-11-05"},{"url":"https://na.cx/i/KsHoigW.gif","title":"26-11-04","link":"https://mypikpak.com","date":"2026-11-04"},{"url":"https://na.cx/i/va5M0uS.webp","title":"26-11-04","link":"https://mypikpak.com","date":"2026-11-04"},{"url":"https://na.cx/i/5upx3ZD.gif","title":"26-11-04","link":"https://mypikpak.com","date":"2026-11-04"},{"url":"https://na.cx/i/XYpmXme.gif","title":"26-11-04","link":"https://mypikpak.com","date":"2026-11-04"},{"url":"https://na.cx/i/Rw5k4Xi.gif","title":"26-11-04","link":"https://mypikpak.com","date":"2026-11-04"},{"url":"https://na.cx/i/uxMpaC7.gif","title":"26-11-04","link":"https://mypikpak.com","date":"2026-11-04"},{"url":"https://na.cx/i/m8b1cRR.gif","title":"26-11-04","link":"https://mypikpak.com","date":"2026-11-04"},{"url":"https://na.cx/i/02PaQEq.gif","title":"26-11-04","link":"https://mypikpak.com","date":"2026-11-04"},{"url":"https://na.cx/i/yf9aHJi.gif","title":"26-11-04","link":"https://mypikpak.com","date":"2026-11-04"},{"url":"https://na.cx/i/Gwwo2JN.gif","title":"26-11-04","link":"https://mypikpak.com","date":"2026-11-04"},{"url":"https://na.cx/i/sa3iRCv.gif","title":"26-11-04","link":"https://mypikpak.com","date":"2026-11-04"},{"url":"https://na.cx/i/RC0hcne.webp","title":"26-11-02","link":"https://mypikpak.com","date":"2026-11-02"},{"url":"https://na.cx/i/nfNfJ01.gif","title":"26-11-02","link":"https://mypikpak.com","date":"2026-11-02"},{"url":"https://na.cx/i/TLrTu7L.gif","title":"26-11-02","link":"https://mypikpak.com","date":"2026-11-02"},{"url":"https://na.cx/i/7G7vxUu.webp","title":"26-11-02","link":"https://mypikpak.com","date":"2026-11-02"},{"url":"https://na.cx/i/XrMcMdJ.gif","title":"26-11-02","link":"https://mypikpak.com","date":"2026-11-02"},{"url":"https://na.cx/i/jZteKVR.gif","title":"26-10-31","link":"https://mypikpak.com","date":"2026-10-31"},{"url":"https://na.cx/i/JAK5JQc.webp","title":"26-10-30","link":"https://mypikpak.com","date":"2026-10-30"},{"url":"https://na.cx/i/hWwG1B9.gif","title":"26-10-30","link":"https://mypikpak.com","date":"2026-10-30"},{"url":"https://na.cx/i/YTPYjoJ.gif","title":"26-10-30","link":"https://mypikpak.com","date":"2026-10-30"},{"url":"https://na.cx/i/FpMLJQi.gif","title":"26-10-30","link":"https://mypikpak.com","date":"2026-10-30"},{"url":"https://na.cx/i/G3N7cJN.gif","title":"26-10-30","link":"https://mypikpak.com","date":"2026-10-30"},{"url":"https://na.cx/i/OiN7cJt.gif","title":"26-10-30","link":"https://mypikpak.com","date":"2026-10-30"},{"url":"https://na.cx/i/Bi1oDhY.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/F0gn1D0.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/a7rWYfe.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/N65W55L.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/V9dqs3U.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/saE8Xcm.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/mmv4vxo.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/f3KJeHR.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/cNniz4e.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/xvewUY5.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/Zde5eYY.webp","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/p7ksGnT.webp","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/TvEwU4d.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/aeADzZb.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/fC9d0tG.webp","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/8s9QD9G.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/TfBLeYX.webp","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/HSVEbzZ.gif","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"},{"url":"https://na.cx/i/bR4pvxg.webp","title":"26-10-26","link":"https://mypikpak.com","date":"2026-10-26"}];
 var filterMode='all',curDate='',recentDates=[],curIdx=0,renderedCount=0,colMode=0,BATCH=18,playTimer=null,touchStartX=0;
 var FAV_KEY='ltx_gif_favs_v1',favMap={};try{favMap=JSON.parse(localStorage.getItem(FAV_KEY)||'{}')||{};}catch(e){favMap={};}
 function initFilters(){
-  var seen = {}, dates = [];
-  for(var i=0;i<DATA.length;i++){ var d=DATA[i].date; if(d){ if(!seen[d]){ seen[d]=0; dates.push(d); } seen[d]++; } }
-  dates.sort().reverse(); recentDates = dates.slice(0, 3);
-  var sel = document.getElementById("dateSel");
-  var chipBar = document.getElementById("chipBar");
+  var seen={},dates=[];
+  for(var i=0;i<DATA.length;i++){var d=DATA[i].date;if(d){if(!seen[d]){seen[d]=0;dates.push(d);}seen[d]++;}}
+  dates.sort().reverse();recentDates=dates.slice(0,3);
+  var sel=document.getElementById("dateSel"),cb=document.getElementById("chipBar");
   for(var j=0;j<dates.length;j++){
-    var dStr = dates[j], label = dStr + " (" + seen[dStr] + ")";
-    var opt = document.createElement("option"); opt.value = dStr; opt.textContent = label + " 張"; sel.appendChild(opt);
-    if(j < 12){
-      (function(targetDate, chipLabel){
-        var ch = document.createElement("button");
-        ch.className = "chip";
-        ch.setAttribute("data-date", targetDate);
-        ch.textContent = chipLabel;
-        ch.onclick = function(){
-          if(filterMode === "date" && curDate === targetDate) setFilterUI("all", "");
-          else setFilterUI("date", targetDate);
-        };
-        chipBar.appendChild(ch);
-      })(dStr, label);
-    }
+    var ds=dates[j],lb=ds+" ("+seen[ds]+")";
+    var opt=document.createElement("option");opt.value=ds;opt.textContent=lb+" 張";sel.appendChild(opt);
+    if(j<12){(function(td,cl){var ch=document.createElement("button");ch.className="chip";ch.setAttribute("data-date",td);ch.textContent=cl;ch.onclick=function(){if(filterMode==="date"&&curDate===td)setFilterUI("all","");else setFilterUI("date",td);};cb.appendChild(ch);})(ds,lb);}
   }
-  document.getElementById("btnCopyPw").textContent = "🔑 ltxxx (" + DATA.length + ")";
-  updateFavCountUI();
+  document.getElementById("btnCopyPw").textContent="🔑 ltxxx ("+DATA.length+")";updateFavCountUI();
 }
-function setFilterUI(mode, dVal){
-  filterMode = mode; curDate = dVal || "";
-  document.getElementById("btnAll").className = "pill" + (mode==="all"?" active":"");
-  document.getElementById("btnRecent").className = "pill" + (mode==="recent"?" active":"");
-document.getElementById("btnFavs").className = "pill fav-pill" + (mode==="favs"?" active":"");
-document.getElementById("dateSel").value = (mode==="date") ? curDate : "";
-var chips = document.querySelectorAll(".chip");
-for(var i=0;i<chips.length;i++){
-chips[i].className = "chip" + (mode==="date" && chips[i].getAttribute("data-date")===curDate ? " active" : "");
+function setFilterUI(m,dv){
+  filterMode=m;curDate=dv||"";
+  document.getElementById("btnAll").className="pill"+(m==="all"?" active":"");
+  document.getElementById("btnRecent").className="pill"+(m==="recent"?" active":"");
+  document.getElementById("btnFavs").className="pill fav-pill"+(m==="favs"?" active":"");
+  document.getElementById("dateSel").value=(m==="date")?curDate:"";
+  var cs=document.querySelectorAll(".chip");for(var i=0;i<cs.length;i++)cs[i].className="chip"+(m==="date"&&cs[i].getAttribute("data-date")===curDate?" active":"");
+  resetAndRender();
 }
-resetAndRender();
-}
-document.getElementById("btnAll").onclick = function(){ setFilterUI("all", ""); };
-document.getElementById("btnRecent").onclick = function(){ setFilterUI("recent", ""); };
-document.getElementById("btnFavs").onclick = function(){ setFilterUI("favs", ""); };
-document.getElementById("dateSel").onchange = function(){ if(this.value) setFilterUI("date", this.value); else setFilterUI("all", ""); };
-document.getElementById("kw").oninput = function(){ resetAndRender(); };
-document.getElementById("btnCopyPw").onclick = function(){
-var btn = this;
-if(navigator.clipboard){ navigator.clipboard.writeText("ltxxx").then(function(){ var orig=btn.textContent; btn.textContent="✅ 已複製 ltxxx"; setTimeout(function(){ btn.textContent=orig; }, 1500); }); }
-};
-document.getElementById("btnShuffle").onclick = function(){ for(var i=DATA.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=DATA[i]; DATA[i]=DATA[j]; DATA[j]=t; } resetAndRender(); };
-document.getElementById("btnCols").onclick = function(){ var w=document.getElementById("wall"); colMode=(colMode+1)%4; w.className="masonry"+(colMode===1?" cols-1":colMode===2?" cols-2":colMode===3?" cols-5":""); };
-var topBtn = document.getElementById("btnTop");
-window.addEventListener("scroll", function(){ if(window.scrollY > 400) topBtn.classList.add("show"); else topBtn.classList.remove("show"); }, {passive:true});
-topBtn.onclick = function(){ window.scrollTo({top: 0, behavior: "smooth"}); };
-function stopAutoPlay(){
-if(playTimer){ clearInterval(playTimer); playTimer = null; }
-var b = document.getElementById("btnAutoPlay");
-if(b){ b.className = "lb-btn"; b.textContent = "▶️ 自動輪播"; }
-}
-function toggleAutoPlay(e){
-if(e) e.stopPropagation();
-var b = document.getElementById("btnAutoPlay");
-if(playTimer){ stopAutoPlay(); }
-else {
-b.className = "lb-btn playing"; b.textContent = "⏸️ 輪播中 (4s)";
-playTimer = setInterval(function(){ curIdx++; showLb(); }, 4000);
-}
-}
-document.getElementById("btnAutoPlay").onclick = toggleAutoPlay;
-function syncLbFavBtn(url){
-var b = document.getElementById("btnLbFav");
-if(!b) return;
-if(isFaved(url)){ b.className = "lb-btn faved"; b.textContent = "❤️ 已收藏"; }
-else { b.className = "lb-btn"; b.textContent = "🤍 收藏"; }
-}
-document.getElementById("btnLbFav").onclick = function(e){
-e.stopPropagation();
-var list = window._curList; if(!list || !list.length) return;
-var it = list[curIdx]; if(!it) return;
-toggleFav(it.url);
-syncLbFavBtn(it.url);
-var cardBtns = document.querySelectorAll('.fav-btn[data-url="' + it.url.replace(/"/g, '\"') + '"]');
-for(var i=0;i<cardBtns.length;i++){
-var on = isFaved(it.url);
-cardBtns[i].className = "fav-btn" + (on ? " faved" : "");
-cardBtns[i].textContent = on ? "❤️" : "🤍";
-}
-if(filterMode === "favs" && !isFaved(it.url)){
-resetAndRender();
-if(!window._curList.length) closeLb(); else showLb();
-}
-};
-function closeLb(){ stopAutoPlay(); document.getElementById("lb").classList.remove("show"); }
-function openLb(idx){ curIdx = idx; showLb(); }
-function showLb(){
-var list=window._curList; if(!list||!list.length) return;
-if(curIdx<0) curIdx=list.length-1; if(curIdx>=list.length) curIdx=0;
-var it=list[curIdx]; document.getElementById("lb-img").src=it.url;
-document.getElementById("lb-txt").textContent=(curIdx+1)+"/"+list.length+" · "+(it.title||it.date||"");
-syncLbFavBtn(it.url);
-var lnk=document.getElementById("lb-link"); lnk.href=it.link||"#"; lnk.style.display=it.link?"inline-block":"none";
-document.getElementById("lb").classList.add("show");
-}
+document.getElementById("btnAll").onclick=function(){setFilterUI("all","");};
+document.getElementById("btnRecent").onclick=function(){setFilterUI("recent","");};
+document.getElementById("btnFavs").onclick=function(){setFilterUI("favs","");};
+document.getElementById("dateSel").onchange=function(){if(this.value)setFilterUI("date",this.value);else setFilterUI("all","");};
+document.getElementById("kw").oninput=function(){resetAndRender();};
+document.getElementById("btnCopyPw").onclick=function(){var b=this;if(navigator.clipboard)navigator.clipboard.writeText("ltxxx").then(function(){var o=b.textContent;b.textContent="✅ 已複製 ltxxx";setTimeout(function(){b.textContent=o;},1500);});};
+document.getElementById("btnShuffle").onclick=function(){for(var i=DATA.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=DATA[i];DATA[i]=DATA[j];DATA[j]=t;}resetAndRender();};
+document.getElementById("btnCols").onclick=function(){var w=document.getElementById("wall");colMode=(colMode+1)%4;w.className="masonry"+(colMode===1?" cols-1":colMode===2?" cols-2":colMode===3?" cols-5":"");};
+var topBtn=document.getElementById("btnTop");window.addEventListener("scroll",function(){if(window.scrollY>400)topBtn.classList.add("show");else topBtn.classList.remove("show");},{passive:true});topBtn.onclick=function(){window.scrollTo({top:0,behavior:"smooth"});};
+function stopAutoPlay(){if(playTimer){clearInterval(playTimer);playTimer=null;}var b=document.getElementById("btnAutoPlay");if(b){b.className="lb-btn";b.textContent="▶️ 自動輪播";}}
+document.getElementById("btnAutoPlay").onclick=function(e){e.stopPropagation();if(playTimer)stopAutoPlay();else{this.className="lb-btn playing";this.textContent="⏸️ 輪播中 (4s)";playTimer=setInterval(function(){curIdx++;showLb();},4000);}};
+function syncLbFav(u){var b=document.getElementById("btnLbFav");if(isFaved(u)){b.className="lb-btn faved";b.textContent="❤️ 已收藏";}else{b.className="lb-btn";b.textContent="🤍 收藏";}}
+document.getElementById("btnLbFav").onclick=function(e){e.stopPropagation();var l=window._curList;if(!l||!l.length)return;var it=l[curIdx];toggleFav(it.url);syncLbFav(it.url);resetAndRender();};
+function closeLb(){stopAutoPlay();document.getElementById("lb").classList.remove("show");}
+function openLb(idx){curIdx=idx;showLb();}
+function showLb(){var l=window._curList;if(!l||!l.length)return;if(curIdx<0)curIdx=l.length-1;if(curIdx>=l.length)curIdx=0;var it=l[curIdx];document.getElementById("lb-img").src=it.url;document.getElementById("lb-txt").textContent=(curIdx+1)+"/"+l.length+" · "+(it.title||it.date||"");syncLbFav(it.url);var lnk=document.getElementById("lb-link");lnk.href=it.link||"#";lnk.style.display=it.link?"inline-block":"none";document.getElementById("lb").classList.add("show");}
 document.getElementById("btnPrev").onclick=function(e){e.stopPropagation();curIdx--;showLb();};
 document.getElementById("btnNext").onclick=function(e){e.stopPropagation();curIdx++;showLb();};
-var lbEl = document.getElementById("lb");
-lbEl.onclick=function(e){if(e.target.id==="lb") closeLb();};
-lbEl.addEventListener("touchstart", function(e){ touchStartX = e.changedTouches.at(0).screenX; }, {passive:true});
-lbEl.addEventListener("touchend", function(e){
-var diff = e.changedTouches.at(0).screenX - touchStartX;
-if(Math.abs(diff) > 45){ if(diff > 0) curIdx--; else curIdx++; showLb(); }
-}, {passive:true});
+var lbEl=document.getElementById("lb");lbEl.onclick=function(e){if(e.target.id==="lb")closeLb();};
+lbEl.addEventListener("touchstart",function(e){touchStartX=e.changedTouches.at(0).screenX;},{passive:true});
+lbEl.addEventListener("touchend",function(e){var df=e.changedTouches.at(0).screenX-touchStartX;if(Math.abs(df)>45){if(df>0)curIdx--;else curIdx++;showLb();}},{passive:true});
 document.addEventListener("keydown",function(e){if(!lbEl.classList.contains("show"))return;if(e.key==="Escape")closeLb();if(e.key==="ArrowLeft"){curIdx--;showLb();}if(e.key==="ArrowRight"){curIdx++;showLb();}});
-function getFiltered(){
-var q=(document.getElementById("kw").value||"").trim().toLowerCase();
-return DATA.filter(function(it){
-if(filterMode==="favs" && !isFaved(it.url)) return false;
-if(filterMode==="recent" && recentDates.indexOf(it.date)===-1) return false;
-if(filterMode==="date" && it.date!==curDate) return false;
-if(q && ((it.title||"").toLowerCase().indexOf(q)===-1 && (it.date||"").indexOf(q)===-1)) return false;
-return true;
-});
-}
-function appendBatch(){
-var list=window._curList||[], wall=document.getElementById("wall");
-if(list.length === 0 && renderedCount === 0){
-wall.innerHTML = '' + (filterMode==="favs" ? '還沒有收藏任何動圖，點擊卡片右上角的 🤍 即可加入個人收藏！' : '找不到符合條件的動圖') + '';
-return;
-}
-var end=Math.min(renderedCount+BATCH, list.length);
-for(var i=renderedCount;i<end;i++){
-(function(idx, it){
-var d=document.createElement("div"); d.className="item";
-var fb=document.createElement("button");
-var on=isFaved(it.url);
-fb.className="fav-btn"+(on?" faved":"");
-fb.setAttribute("data-url", it.url);
-fb.textContent=on?"❤️":"🤍";
-fb.title="加入 / 取消收藏";
-fb.onclick=function(e){
-e.stopPropagation();
-toggleFav(it.url);
-var nowOn=isFaved(it.url);
-fb.className="fav-btn"+(nowOn?" faved":"");
-fb.textContent=nowOn?"❤️":"🤍";
-if(filterMode==="favs" && !nowOn) resetAndRender();
-};
-var img=document.createElement("img"); img.loading="lazy"; img.referrerPolicy="no-referrer"; img.src=it.url;
-img.onload=function(){ d.classList.add("loaded"); };
-var ov=document.createElement("div"); ov.className="overlay";
-var sp=document.createElement("span"); sp.className="cap"; sp.textContent=it.title||it.date||"";
-ov.appendChild(sp); d.appendChild(fb); d.appendChild(img); d.appendChild(ov);
-d.onclick=function(){ openLb(idx); };
-wall.appendChild(d);
-})(i, list[i]);
-}
-renderedCount=end;
-}
-function resetAndRender(){
-window._curList=getFiltered(); renderedCount=0;
-document.getElementById("wall").innerHTML="";
-appendBatch();
-}
-new IntersectionObserver(function(es){ if(es.isIntersecting) appendBatch(); }, {rootMargin:"600px"}).observe(document.getElementById("sentinel"));
-initFilters();
-resetAndRender();
+function getFiltered(){var q=(document.getElementById("kw").value||"").trim().toLowerCase();return DATA.filter(function(it){if(filterMode==="favs"&&!isFaved(it.url))return false;if(filterMode==="recent"&&recentDates.indexOf(it.date)===-1)return false;if(filterMode==="date"&&it.date!==curDate)return false;if(q&&((it.title||"").toLowerCase().indexOf(q)===-1&&(it.date||"").indexOf(q)===-1))return false;return true;});}
+function appendBatch(){var l=window._curList||[],w=document.getElementById("wall"),end=Math.min(renderedCount+BATCH,l.length);for(var i=renderedCount;i<end;i++){(function(idx,it){var d=document.createElement("div");d.className="item";var fb=document.createElement("button");var on=isFaved(it.url);fb.className="fav-btn"+(on?" faved":"");fb.textContent=on?"❤️":"🤍";fb.onclick=function(e){e.stopPropagation();toggleFav(it.url);var n=isFaved(it.url);fb.className="fav-btn"+(n?" faved":"");fb.textContent=n?"❤️":"🤍";if(filterMode==="favs"&&!n)resetAndRender();};var img=document.createElement("img");img.loading="lazy";img.referrerPolicy="no-referrer";img.src=it.url;img.onload=function(){d.classList.add("loaded");};var ov=document.createElement("div");ov.className="overlay";var sp=document.createElement("span");sp.className="cap";sp.textContent=it.title||it.date||"";ov.appendChild(sp);d.appendChild(fb);d.appendChild(img);d.appendChild(ov);d.onclick=function(){openLb(idx);};w.appendChild(d);})(i,l[i]);}renderedCount=end;}
+function resetAndRender(){window._curList=getFiltered();renderedCount=0;document.getElementById("wall").innerHTML="";appendBatch();}
+new IntersectionObserver(function(es){if(es.isIntersecting)appendBatch();},{rootMargin:"600px"}).observe(document.getElementById("sentinel"));
+initFilters();resetAndRender();
 </script></body></html>
