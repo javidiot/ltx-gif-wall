@@ -332,4 +332,15 @@ runFilter();
   },{passive:true});
 })();
 </script>
+<script>
+fetch("cat_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
+  if (Array.isArray(d) && d.length > 0 && typeof LIST !== "undefined") {
+    LIST.length = 0;
+    Array.prototype.push.apply(LIST, d);
+    if (typeof initRecentDates === "function") initRecentDates();
+    if (typeof initHotChips === "function") initHotChips();
+    if (typeof runFilter === "function") runFilter();
+  }
+}).catch(function(){});
+</script>
 </body></html>
