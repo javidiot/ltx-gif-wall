@@ -427,10 +427,15 @@ document.addEventListener("DOMContentLoaded", function() {
       };
       cards.sort((a, b) => {
         const ma = getInfo(a), mb = getInfo(b);
-        if (mode === "date") {
+        if (mode === "date-desc") {
           const da = ma.date === "unknown date" ? "0000-00-00" : ma.date;
           const db = mb.date === "unknown date" ? "0000-00-00" : mb.date;
           return db !== da ? db.localeCompare(da) : ma.idx - mb.idx;
+        }
+        if (mode === "date-asc") {
+          const da = ma.date === "unknown date" ? "9999-99-99" : ma.date;
+          const db = mb.date === "unknown date" ? "9999-99-99" : mb.date;
+          return da !== db ? da.localeCompare(db) : mb.idx - ma.idx;
         }
         if (mode === "name-asc" || mode === "name-desc") {
           if (!ma.actress && !mb.actress) return ma.idx - mb.idx;
@@ -477,9 +482,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
       rows.sort((a, b) => {
         const ra = parseRow(a), rb = parseRow(b);
-        if (mode === "date") {
-          if (rb.date !== ra.date) return rb.date.localeCompare(ra.date);
-          return ra.orig - rb.orig;
+        if (mode === "date-desc") {
+          return rb.date !== ra.date ? rb.date.localeCompare(ra.date) : ra.orig - rb.orig;
+        }
+        if (mode === "date-asc") {
+          const da = ra.date || "99-99-99";
+          const db = rb.date || "99-99-99";
+          return da !== db ? da.localeCompare(db) : rb.orig - ra.orig;
         }
         if (mode === "name-asc" || mode === "name-desc") {
           if (!ra.name && !rb.name) return ra.orig - rb.orig;
@@ -504,11 +513,12 @@ document.addEventListener("DOMContentLoaded", function() {
   const bar = document.createElement("div");
   bar.id = "ltx-sort-bar";
   bar.innerHTML =
-    '<button type="button" class="sort-btn active" data-mode="date">日期</button>' +
-    '<button type="button" class="sort-btn" data-mode="name-asc">名字 A-Z</button>' +
-    '<button type="button" class="sort-btn" data-mode="name-desc">名字 Z-A</button>' +
-    '<button type="button" class="sort-btn" data-mode="code-asc">番號 A-Z</button>' +
-    '<button type="button" class="sort-btn" data-mode="code-desc">番號 Z-A</button>';
+    '<button type="button" class="sort-btn active" data-mode="date-desc">日期(倒序)</button>' +
+    '<button type="button" class="sort-btn" data-mode="date-asc">日期(順序)</button>' +
+    '<button type="button" class="sort-btn" data-mode="name-asc">名字(A-Z)</button>' +
+    '<button type="button" class="sort-btn" data-mode="name-desc">名字(Z-A)</button>' +
+    '<button type="button" class="sort-btn" data-mode="code-asc">番號(A-Z)</button>' +
+    '<button type="button" class="sort-btn" data-mode="code-desc">番號(Z-A)</button>';
 
   const anchor = isGifWall ? findGifGrid() : document.querySelector("table");
   if (anchor && anchor.parentElement) {
@@ -526,4 +536,4 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 </script>
-</body></html>
+</body>
