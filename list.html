@@ -291,4 +291,46 @@ window.addEventListener("load", function() {
   });
 });
 </script>
+
+<script id="ltx-fav-backup">
+(function() {
+  window.addEventListener("load", function() {
+    const sortBar = document.getElementById("ltx-sort-bar");
+    if (!sortBar || document.getElementById("ltxFavBakBtn")) return;
+
+    const btn = document.createElement("button");
+    btn.id = "ltxFavBakBtn";
+    btn.textContent = "💾 收藏備份";
+    btn.title = "匯出或還原紅心收藏紀錄（跨手機/電腦同步）";
+
+    btn.onclick = function() {
+      const box = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.toLowerCase().includes("fav") || k.toLowerCase().includes("watch") || k.toLowerCase().includes("like"))) {
+          box[k] = localStorage.getItem(k);
+        }
+      }
+      const exportStr = JSON.stringify(box);
+      const ans = prompt("【收藏跨設備備份／還原】\n• 目前收藏備份碼已自動複製到剪貼簿！\n• 若要從其他設備「還原」，請清空下方框框並貼上備份碼後按確定：", exportStr);
+      if (ans === null) return;
+      const trimmed = ans.trim();
+      if (trimmed && trimmed !== exportStr) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          Object.keys(parsed).forEach(k => localStorage.setItem(k, parsed[k]));
+          alert("✅ 收藏紀錄還原成功！即將重新整理套用...");
+          location.reload();
+        } catch(e) {
+          alert("⚠️ 備份碼格式不正確，未變更任何資料。");
+        }
+      } else {
+        try { navigator.clipboard.writeText(exportStr); } catch(e) {}
+      }
+    };
+
+    sortBar.appendChild(btn);
+  });
+})();
+</script>
 </body></html>
