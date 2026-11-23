@@ -72,7 +72,7 @@ function initFilters(){
   var seen={},dates=[];
   for(var i=0;i<DATA.length;i++){var d=DATA[i].date;if(d){if(!seen[d]){seen[d]=0;dates.push(d);}seen[d]++;}}
   dates.sort().reverse();recentDates=dates.slice(0,3);
-  var sel=document.getElementById("dateSel"),cb=document.getElementById("chipBar");
+  var sel=document.getElementById("dateSel"),cb=document.getElementById("chipBar");if(cb)cb.innerHTML="";if(sel)sel.innerHTML="<option value=\"\">📅 全部日期...</option>";dates=Array.from(new Set(dates));
   for(var j=0;j<dates.length;j++){
     var ds=dates[j],lb=ds+" ("+seen[ds]+")";
     var opt=document.createElement("option");opt.value=ds;opt.textContent=lb+" 張";sel.appendChild(opt);
