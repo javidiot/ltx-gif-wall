@@ -1,18 +1,24 @@
 <style id="ltx-sort-style">
   #ltx-sort-bar {
-    position: sticky;
-    top: 0;
-    z-index: 900;
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
     align-items: center;
     margin: 0 0 10px 0;
-    padding: 8px 12px;
-    background: rgba(17, 17, 21, 0.88);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 7px 14px;
+    background: rgba(17, 17, 21, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
+    width: 100%;
+  }
+  #ltx-sort-bar.is-fixed {
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 9500;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
   }
   #ltx-sort-bar button.sort-btn {
     background: rgba(255, 255, 255, 0.07);
@@ -267,9 +273,9 @@ document.addEventListener("DOMContentLoaded", function() {
             if (!ra.name && !rb.name) return ra.orig - rb.orig;
             if (!ra.name) return 1;
             if (!rb.name) return -1;
-            const cmp = ra.name.localeCompare(rb.name, "ja");
-            return mode === "name-asc" ? cmp : -cmp;
-          }
+const cmp = ra.name.localeCompare(rb.name, "ja");
+return mode === "name-asc" ? cmp : -cmp;
+}
 if (mode === "code-asc" || mode === "code-desc") {
 if (!ra.code && !rb.code) return ra.orig - ra.orig;
 if (!ra.code) return 1;
@@ -285,6 +291,9 @@ rows.forEach(r => tbody.appendChild(r));
 setTimeout(() => { isApplyingSort = false; }, 30);
 }
 }
+const spacer = document.createElement("div");
+spacer.id = "ltx-sort-spacer";
+spacer.style.display = "none";
 const bar = document.createElement("div");
 bar.id = "ltx-sort-bar";
 bar.innerHTML =
@@ -297,10 +306,47 @@ bar.innerHTML =
 '隨機';
 const anchor = isGifWall ? findGifGrid() : document.querySelector("table");
 if (anchor && anchor.parentElement) {
+anchor.parentElement.insertBefore(spacer, anchor);
 anchor.parentElement.insertBefore(bar, anchor);
 } else {
+document.body.insertBefore(spacer, document.body.firstChild);
 document.body.insertBefore(bar, document.body.firstChild);
 }
+function detectTopHeaderHeight() {
+let maxBottom = 0;
+document.querySelectorAll("header, nav, .header, .top-bar, .sticky, [style*='sticky'], [style*='fixed']").forEach(el => {
+if (el.id === "ltx-sort-bar" || el.id === "ltx-copy-toast") return;
+const st = window.getComputedStyle(el);
+if ((st.position === "fixed" || st.position === "sticky") && st.display !== "none") {
+const r = el.getBoundingClientRect();
+if (r.top <= 5 && r.height > 0 && r.height < 160 && r.bottom > maxBottom) {
+maxBottom = r.bottom;
+}
+}
+});
+return Math.round(maxBottom);
+}
+function updateFixedBar() {
+const topOffset = detectTopHeaderHeight();
+const refEl = bar.classList.contains("is-fixed") ? spacer : bar;
+const rect = refEl.getBoundingClientRect();
+if (rect.top <= topOffset) {
+if (!bar.classList.contains("is-fixed")) {
+spacer.style.height = bar.offsetHeight + "px";
+spacer.style.display = "block";
+bar.classList.add("is-fixed");
+}
+bar.style.top = topOffset + "px";
+} else {
+if (bar.classList.contains("is-fixed")) {
+bar.classList.remove("is-fixed");
+bar.style.top = "";
+spacer.style.display = "none";
+}
+}
+}
+window.addEventListener("scroll", updateFixedBar, { passive: true });
+window.addEventListener("resize", updateFixedBar, { passive: true });
 bar.querySelectorAll(".sort-btn").forEach(btn => {
 btn.addEventListener("click", () => {
 bar.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
