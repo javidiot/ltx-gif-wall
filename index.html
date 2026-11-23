@@ -162,7 +162,7 @@ window.addEventListener("load", function() {
   let preloadHolders = [];
 
   function pickNextBatch(excludeUrls) {
-    let seen = new Set(JSON.parse(localStorage.getItem("ltx_cdn309_deck_v6") || "[]"));
+    let seen = new Set(JSON.parse(localStorage.getItem("ltx_clean309_v7") || "[]"));
     if (excludeUrls) excludeUrls.forEach(u => seen.add(u));
     let un = fullData.filter(it => !seen.has(it.url));
     if (un.length === 0) { seen.clear(); un = fullData.slice(); }
@@ -208,7 +208,7 @@ window.addEventListener("load", function() {
 
       if (m === "random") {
         abortPendingImages(wall);
-        let seen = new Set(JSON.parse(localStorage.getItem("ltx_cdn309_deck_v6") || "[]"));
+        let seen = new Set(JSON.parse(localStorage.getItem("ltx_clean309_v7") || "[]"));
         let batch = null;
         let remCount = 0;
 
@@ -224,7 +224,7 @@ window.addEventListener("load", function() {
           remCount = Math.max(0, pack.totalUnseen - batch.length);
         }
 
-        localStorage.setItem("ltx_cdn309_deck_v6", JSON.stringify(Array.from(seen)));
+        localStorage.setItem("ltx_clean309_v7", JSON.stringify(Array.from(seen)));
         if (rnd) rnd.textContent = "隨機 (" + remCount + "/" + fullData.length + ")";
 
         window._curList = batch;
