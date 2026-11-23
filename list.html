@@ -236,7 +236,7 @@ document.addEventListener("DOMContentLoaded",function(){
 if(document.getElementById("ltx-sort-bar"))return;
 const bar=document.createElement("div");bar.id="ltx-sort-bar";
 bar.innerHTML='<button class="active" data-m="date-desc">日期(倒序)</button><button data-m="date-asc">日期(順序)</button><button data-m="name-asc">名字(A-Z)</button><button data-m="name-desc">名字(Z-A)</button><button data-m="code-asc">番號(A-Z)</button><button data-m="code-desc">番號(Z-A)</button><button id="ltxRnd" data-m="random">隨機</button>';
-document.body.appendChild(bar);bar.querySelectorAll("button").forEach(btn=>{btn.onclick=()=>{
+const allBtns=Array.from(document.querySelectorAll("button"));const datePill=allBtns.find(b=>b.textContent&&b.textContent.includes("unknown date"))||allBtns.find(b=>b.textContent&&b.textContent.includes("全部"));if(datePill&&datePill.parentElement&&datePill.parentElement.parentElement){datePill.parentElement.parentElement.appendChild(bar);}else if(datePill&&datePill.parentElement){datePill.parentElement.insertAdjacentElement("afterend",bar);}else{document.body.prepend(bar);}bar.querySelectorAll("button").forEach(btn=>{btn.onclick=()=>{
 bar.querySelectorAll("button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
 const m=btn.dataset.m,rnd=document.getElementById("ltxRnd");
 const tbody=document.querySelector("table tbody");
