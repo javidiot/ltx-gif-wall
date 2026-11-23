@@ -415,7 +415,7 @@ document.addEventListener("DOMContentLoaded", function() {
     return p1 ? p1.parentElement : null;
   }
 
-  function shuffleArray(arr) {
+  function shufflePure(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       const tmp = arr.at(i);
@@ -425,13 +425,56 @@ document.addEventListener("DOMContentLoaded", function() {
     return arr;
   }
 
+  function smartNonRepeatShuffle(items, getKeyFn, storageKey) {
+    let seenSet = new Set();
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      if (Array.isArray(saved)) saved.forEach(k => seenSet.add(String(k)));
+    } catch(e) {}
+
+    let unseen = [];
+    let seen = [];
+    items.forEach(el => {
+      const k = getKeyFn(el);
+      if (seenSet.has(k)) {
+        seen.push(el);
+      } else {
+        unseen.push(el);
+      }
+    });
+
+    if (unseen.length < Math.min(24, items.length)) {
+      seenSet.clear();
+      unseen = items.slice();
+      seen = [];
+    }
+
+    shufflePure(unseen);
+    shufflePure(seen);
+
+    const batchSize = Math.min(36, unseen.length);
+    for (let i = 0; i < batchSize; i++) {
+      seenSet.add(getKeyFn(unseen.at(i)));
+    }
+
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(Array.from(seenSet)));
+    } catch(e) {}
+
+    return unseen.concat(seen);
+  }
+
   function applySort(mode) {
     if (isGifWall) {
       const grid = findGifGrid();
       if (!grid) return;
       const cards = Array.from(grid.children);
       if (mode === "random") {
-        shuffleArray(cards).forEach(c => grid.appendChild(c));
+        const ordered = smartNonRepeatShuffle(cards, (c) => {
+          const im = c.querySelector("img");
+          return im ? (im.getAttribute("src") || im.src || "") : String(Math.random());
+        }, "ltx_gif_seen_pool");
+        ordered.forEach(c => grid.appendChild(c));
         return;
       }
       const getInfo = (card) => {
@@ -477,7 +520,8 @@ document.addEventListener("DOMContentLoaded", function() {
       rows.forEach((tr, i) => { if (!tr.dataset.origIdx) tr.dataset.origIdx = String(i); });
 
       if (mode === "random") {
-        shuffleArray(rows).forEach(r => tbody.appendChild(r));
+        const orderedRows = smartNonRepeatShuffle(rows, (r) => r.dataset.origIdx || r.textContent.slice(0, 40), "ltx_list_seen_pool");
+        orderedRows.forEach(r => tbody.appendChild(r));
         return;
       }
 
