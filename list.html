@@ -226,8 +226,7 @@ new IntersectionObserver(function(es){ if(es.isIntersecting)appendCards(); },{ro
 initRecentDates(); initHotChips(); saveFavs(); var usp=new URLSearchParams(window.location.search);if(usp.get("q")){qInput.value=usp.get("q");clrBtn.classList.add("show");}if(usp.get("k")==="4k"){only4k=true;syncFilterBtns();}if(usp.get("m")==="recent"){onlyRecent=true;syncFilterBtns();}
 runFilter();
 </script><style id="ltx-sort-style">
-#ltx-sort-bar{position:fixed;top:84px;left:0;right:0;z-index:9990;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 16px;background:rgba(15,16,20,0.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.1);}
-body{padding-top:76px;}
+#ltx-sort-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 16px 8px 16px;width:100%;}
 #ltx-sort-bar button{background:rgba(255,255,255,.07);color:#9ca3af;border:1px solid rgba(255,255,255,.14);padding:3px 11px;height:26px;border-radius:999px;font-size:12px;cursor:pointer;}
 #ltx-sort-bar button.active{background:#10b981;color:#fff;border-color:#10b981;font-weight:600;}
 </style>
@@ -236,7 +235,8 @@ document.addEventListener("DOMContentLoaded",function(){
 if(document.getElementById("ltx-sort-bar"))return;
 const bar=document.createElement("div");bar.id="ltx-sort-bar";
 bar.innerHTML='<button class="active" data-m="date-desc">日期(倒序)</button><button data-m="date-asc">日期(順序)</button><button data-m="name-asc">名字(A-Z)</button><button data-m="name-desc">名字(Z-A)</button><button data-m="code-asc">番號(A-Z)</button><button data-m="code-desc">番號(Z-A)</button><button id="ltxRnd" data-m="random">隨機</button>';
-const allBtns=Array.from(document.querySelectorAll("button"));const datePill=allBtns.find(b=>b.textContent&&b.textContent.includes("unknown date"))||allBtns.find(b=>b.textContent&&b.textContent.includes("全部"));if(datePill&&datePill.parentElement&&datePill.parentElement.parentElement){datePill.parentElement.parentElement.appendChild(bar);}else if(datePill&&datePill.parentElement){datePill.parentElement.insertAdjacentElement("afterend",bar);}else{document.body.prepend(bar);}bar.querySelectorAll("button").forEach(btn=>{btn.onclick=()=>{
+const dp=Array.from(document.querySelectorAll("button")).find(b=>b.textContent&&(b.textContent.includes("unknown date")||b.textContent.includes("全部")));
+if(dp&&dp.parentElement&&dp.parentElement.parentElement){dp.parentElement.parentElement.appendChild(bar);}else if(dp&&dp.parentElement){dp.parentElement.insertAdjacentElement("afterend",bar);}else{const tb=document.querySelector("table");if(tb)tb.parentElement.insertBefore(bar,tb);else document.body.prepend(bar);}bar.querySelectorAll("button").forEach(btn=>{btn.onclick=()=>{
 bar.querySelectorAll("button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
 const m=btn.dataset.m,rnd=document.getElementById("ltxRnd");
 const tbody=document.querySelector("table tbody");
