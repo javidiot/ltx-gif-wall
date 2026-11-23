@@ -415,11 +415,25 @@ document.addEventListener("DOMContentLoaded", function() {
     return p1 ? p1.parentElement : null;
   }
 
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr.at(i);
+      arr.splice(i, 1, arr.at(j));
+      arr.splice(j, 1, tmp);
+    }
+    return arr;
+  }
+
   function applySort(mode) {
     if (isGifWall) {
       const grid = findGifGrid();
       if (!grid) return;
       const cards = Array.from(grid.children);
+      if (mode === "random") {
+        shuffleArray(cards).forEach(c => grid.appendChild(c));
+        return;
+      }
       const getInfo = (card) => {
         const im = card.querySelector("img");
         if (!im) return { idx: 9999, date: "", actress: "", code: "" };
@@ -461,6 +475,11 @@ document.addEventListener("DOMContentLoaded", function() {
       if (rows.length === 0) return;
 
       rows.forEach((tr, i) => { if (!tr.dataset.origIdx) tr.dataset.origIdx = String(i); });
+
+      if (mode === "random") {
+        shuffleArray(rows).forEach(r => tbody.appendChild(r));
+        return;
+      }
 
       const parseRow = (tr) => {
         const cells = Array.from(tr.querySelectorAll("td"));
@@ -518,7 +537,8 @@ document.addEventListener("DOMContentLoaded", function() {
     '<button type="button" class="sort-btn" data-mode="name-asc">名字(A-Z)</button>' +
     '<button type="button" class="sort-btn" data-mode="name-desc">名字(Z-A)</button>' +
     '<button type="button" class="sort-btn" data-mode="code-asc">番號(A-Z)</button>' +
-    '<button type="button" class="sort-btn" data-mode="code-desc">番號(Z-A)</button>';
+    '<button type="button" class="sort-btn" data-mode="code-desc">番號(Z-A)</button>' +
+    '<button type="button" class="sort-btn" data-mode="random">隨機</button>';
 
   const anchor = isGifWall ? findGifGrid() : document.querySelector("table");
   if (anchor && anchor.parentElement) {
