@@ -1,1 +1,219 @@
-</body></html>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LTX GIF Wall</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f1014; color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .sticky-top { position: sticky; top: 0; z-index: 900; background: rgba(15, 16, 20, 0.94); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 10px 14px; }
+  .top-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .brand { font-weight: 700; font-size: 16px; color: #10b981; display: flex; align-items: center; gap: 10px; }
+  .brand a { color: #9ca3af; font-size: 12px; text-decoration: none; border: 1px solid #374151; padding: 3px 10px; border-radius: 999px; }
+  .brand a:hover { color: #fff; border-color: #10b981; }
+  #searchInput { background: #1f2128; border: 1px solid #374151; color: #fff; padding: 6px 12px; border-radius: 999px; font-size: 13px; width: 220px; outline: none; }
+  #searchInput:focus { border-color: #10b981; }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+  .pill { background: rgba(255,255,255,0.06); color: #9ca3af; border: 1px solid rgba(255,255,255,0.12); padding: 3px 11px; height: 26px; border-radius: 999px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+  .pill:hover { background: rgba(255,255,255,0.14); color: #fff; }
+  .pill.active { background: #10b981; color: #fff; border-color: #10b981; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; padding: 14px; }
+  .card { background: #181920; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.07); cursor: pointer; position: relative; transition: transform 0.15s; }
+  .card:hover { transform: translateY(-2px); border-color: rgba(16,185,129,0.5); }
+  .card img { width: 100%; height: 190px; object-fit: cover; display: block; background: #000; }
+  .card-foot { padding: 8px 10px; font-size: 12px; color: #d1d5db; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+  .card-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fav-icon { font-size: 14px; color: #6b7280; cursor: pointer; }
+  .fav-icon.liked { color: #ef4444; }
+  #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+  #lightbox.open { display: flex; }
+  #lbImg { max-width: 92vw; max-height: 76vh; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,0.8); }
+  #lbBar { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center; }
+  #lbTitle { font-size: 15px; font-weight: 600; color: #fff; cursor: pointer; text-decoration: underline dotted #10b981; }
+  .lb-btn { background: #10b981; color: #fff; text-decoration: none; padding: 7px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; }
+  .lb-close { background: #374151; }
+</style>
+</head>
+<body>
+<div class="sticky-top">
+  <div class="top-row">
+    <div class="brand"><span>🎬 LTX GIF Wall</span><span id="statCount" style="font-size:12px;color:#9ca3af;"></span><a href="list.html">📋 切換至目錄清單</a></div>
+    <input id="searchInput" type="search" placeholder="搜尋女優、番號或日期...">
+  </div>
+  <div id="dateRow" class="pill-row"></div>
+  <div id="sortRow" class="pill-row">
+    <button class="pill active" data-sort="date-desc">日期(倒序)</button>
+    <button class="pill" data-sort="date-asc">日期(順序)</button>
+    <button class="pill" data-sort="name-asc">名字(A-Z)</button>
+    <button class="pill" data-sort="name-desc">名字(Z-A)</button>
+    <button class="pill" data-sort="code-asc">番號(A-Z)</button>
+    <button class="pill" data-sort="code-desc">番號(Z-A)</button>
+    <button class="pill" data-sort="fav">❤️ 收藏</button>
+    <button id="rndBtn" class="pill" data-sort="random">🎲 隨機</button>
+  </div>
+</div>
+<div id="grid" class="grid"></div>
+<div id="lightbox">
+  <img id="lbImg" src="">
+  <div id="lbBar">
+    <span id="lbTitle" title="點擊前往目錄搜尋該女優"></span>
+    <a id="lbLink" class="lb-btn" href="#" target="_blank">📂 開啟 PikPak 資料夾</a>
+    <button id="lbPrev" class="lb-btn lb-close">⬅ 上一張</button>
+    <button id="lbNext" class="lb-btn lb-close">下一張 ➡</button>
+    <button id="lbClose" class="lb-btn lb-close">✕ 關閉</button>
+  </div>
+</div><script>
+let rawData = [], filteredData = [], curDate = "ALL", curSort = "date-desc", curLbIdx = 0;
+let favSet = new Set(JSON.parse(localStorage.getItem("ltx_favs") || "[]"));
+
+function parseMeta(it, idx) {
+  const t = String(it.title || "");
+  let actress = "", code = "";
+  const dot = t.indexOf("·");
+  if (dot >= 0) {
+    const rest = t.substring(dot + 1).trim();
+    const op = rest.lastIndexOf("("), cp = rest.lastIndexOf(")");
+    if (op > 0 && cp > op) { actress = rest.substring(0, op).trim(); code = rest.substring(op + 1, cp).trim().toUpperCase(); }
+    else { actress = rest; }
+  }
+  return Object.assign({}, it, { _idx: idx, _actress: actress, _code: code });
+}
+
+function cryptoRand(max) {
+  const b = new Uint32Array(1); window.crypto.getRandomValues(b); return b.at(0) % max;
+}
+
+function drawNonRepeatDeck(list) {
+  let seen = new Set(JSON.parse(localStorage.getItem("ltx_seen_deck") || "[]"));
+  let unseen = list.filter(x => !seen.has(x.url));
+  if (unseen.length === 0) { seen.clear(); unseen = list.slice(); }
+  for (let i = unseen.length - 1; i > 0; i--) {
+    const j = cryptoRand(i + 1);
+    const tmp = unseen.at(i); unseen.splice(i, 1, unseen.at(j)); unseen.splice(j, 1, tmp);
+  }
+  const batch = unseen.slice(0, 36);
+  batch.forEach(x => seen.add(x.url));
+  localStorage.setItem("ltx_seen_deck", JSON.stringify(Array.from(seen)));
+  const rem = Math.max(0, unseen.length - batch.length);
+  document.getElementById("rndBtn").textContent = "🎲 隨機 (" + rem + "/" + list.length + ")";
+  return batch;
+}
+
+function render() {
+  const q = document.getElementById("searchInput").value.trim().toLowerCase();
+  let list = rawData.filter(it => {
+    if (curDate !== "ALL" && it.date !== curDate) return false;
+    if (curSort === "fav" && !favSet.has(it.url)) return false;
+    if (q && !String(it.title).toLowerCase().includes(q) && !String(it.date).toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  if (curSort === "random") {
+    list = drawNonRepeatDeck(list);
+  } else {
+    document.getElementById("rndBtn").textContent = "🎲 隨機";
+    list.sort((a, b) => {
+      if (curSort === "date-desc") {
+        const da = a.date === "unknown date" ? "0000-00-00" : a.date;
+        const db = b.date === "unknown date" ? "0000-00-00" : b.date;
+        return db !== da ? db.localeCompare(da) : a._idx - b._idx;
+      }
+      if (curSort === "date-asc") {
+        const da = a.date === "unknown date" ? "9999-99-99" : a.date;
+        const db = b.date === "unknown date" ? "9999-99-99" : b.date;
+        return da !== db ? da.localeCompare(db) : b._idx - a._idx;
+      }
+      if (curSort === "name-asc" || curSort === "name-desc") {
+        if (!a._actress && !b._actress) return a._idx - b._idx;
+        if (!a._actress) return 1; if (!b._actress) return -1;
+        const c = a._actress.localeCompare(b._actress, "ja");
+        return curSort === "name-asc" ? c : -c;
+      }
+      if (curSort === "code-asc" || curSort === "code-desc") {
+        if (!a._code && !b._code) return a._idx - b._idx;
+        if (!a._code) return 1; if (!b._code) return -1;
+        const c = a._code.localeCompare(b._code, "en", { numeric: true });
+        return curSort === "code-asc" ? c : -c;
+      }
+      return a._idx - b._idx;
+    });
+  }
+
+  filteredData = list;
+  document.getElementById("statCount").textContent = "顯示 " + list.length + " / " + rawData.length + " 張";
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  list.forEach((it, i) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    const liked = favSet.has(it.url) ? "liked" : "";
+    card.innerHTML = '<img src="' + it.url + '" loading="lazy"><div class="card-foot"><span class="card-title">' + it.title + '</span><span class="fav-icon ' + liked + '">♥</span></div>';
+    card.querySelector("img").onclick = () => openLb(i);
+    card.querySelector(".fav-icon").onclick = (e) => {
+      e.stopPropagation();
+      if (favSet.has(it.url)) favSet.delete(it.url); else favSet.add(it.url);
+      localStorage.setItem("ltx_favs", JSON.stringify(Array.from(favSet)));
+      e.target.classList.toggle("liked");
+    };
+    grid.appendChild(card);
+  });
+}
+
+function openLb(idx) {
+  if (filteredData.length === 0) return;
+  curLbIdx = (idx + filteredData.length) % filteredData.length;
+  const it = filteredData.at(curLbIdx);
+  document.getElementById("lbImg").src = it.url;
+  const tEl = document.getElementById("lbTitle");
+  tEl.textContent = it.title;
+  tEl.onclick = () => { if (it._actress) window.open("list.html?q=" + encodeURIComponent(it._actress), "_blank"); };
+  document.getElementById("lbLink").href = it.link || "#";
+  document.getElementById("lightbox").classList.add("open");
+}
+
+document.getElementById("lbClose").onclick = () => document.getElementById("lightbox").classList.remove("open");
+document.getElementById("lbPrev").onclick = () => openLb(curLbIdx - 1);
+document.getElementById("lbNext").onclick = () => openLb(curLbIdx + 1);
+document.getElementById("lightbox").onclick = (e) => { if (e.target.id === "lightbox") document.getElementById("lightbox").classList.remove("open"); };
+document.addEventListener("keydown", (e) => {
+  if (!document.getElementById("lightbox").classList.contains("open")) return;
+  if (e.key === "ArrowRight") openLb(curLbIdx + 1);
+  else if (e.key === "ArrowLeft") openLb(curLbIdx - 1);
+  else if (e.key === "Escape") document.getElementById("lightbox").classList.remove("open");
+});
+
+document.getElementById("searchInput").addEventListener("input", render);
+document.querySelectorAll("#sortRow .pill").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll("#sortRow .pill").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    curSort = btn.dataset.sort;
+    render();
+  };
+});
+
+fetch("gif_gallery.json?t=" + Date.now()).then(r => r.json()).then(arr => {
+  const list = Array.isArray(arr) ? arr : (arr.value || []);
+  rawData = list.map((it, i) => parseMeta(it, i));
+  const dates = Array.from(new Set(rawData.map(x => x.date))).sort((a, b) => {
+    if (a === "unknown date") return 1; if (b === "unknown date") return -1;
+    return b.localeCompare(a);
+  });
+  const dRow = document.getElementById("dateRow");
+  const allBtn = document.createElement("button");
+  allBtn.className = "pill active"; allBtn.textContent = "全部 (" + rawData.length + ")";
+  allBtn.onclick = () => { dRow.querySelectorAll(".pill").forEach(b => b.classList.remove("active")); allBtn.classList.add("active"); curDate = "ALL"; render(); };
+  dRow.appendChild(allBtn);
+  dates.forEach(d => {
+    const cnt = rawData.filter(x => x.date === d).length;
+    const b = document.createElement("button");
+    b.className = "pill"; b.textContent = d.replace(/^20/, "") + " (" + cnt + ")";
+    b.onclick = () => { dRow.querySelectorAll(".pill").forEach(x => x.classList.remove("active")); b.classList.add("active"); curDate = d; render(); };
+    dRow.appendChild(b);
+  });
+  render();
+});
+</script>
+</body>
+</html>
