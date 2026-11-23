@@ -1,16 +1,23 @@
 <style id="ltx-sort-style">
   #ltx-sort-bar {
+    position: sticky;
+    top: 0;
+    z-index: 900;
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
     align-items: center;
-    margin: 6px 0 10px 0;
-    padding: 0 12px;
+    margin: 0 0 10px 0;
+    padding: 8px 12px;
+    background: rgba(17, 17, 21, 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
   #ltx-sort-bar button.sort-btn {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.07);
     color: #9ca3af;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     padding: 3px 11px;
     height: 26px;
     line-height: 18px;
@@ -21,7 +28,7 @@
     white-space: nowrap;
   }
   #ltx-sort-bar button.sort-btn:hover {
-    background: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.16);
     color: #f3f4f6;
   }
   #ltx-sort-bar button.sort-btn.active {
@@ -61,8 +68,6 @@ document.addEventListener("DOMContentLoaded", function() {
   const dataEl = document.getElementById("gif-data");
   const isGifWall = !!dataEl;
   const urlMetaMap = new Map();
-  let currentSortMode = "date-desc";
-  let isApplyingSort = false;
 
   if (isGifWall) {
     let allItems = [];
@@ -108,9 +113,18 @@ document.addEventListener("DOMContentLoaded", function() {
     return p1 ? p1.parentElement : null;
   }
 
-  function shufflePure(arr) {
+  function cryptoRandomInt(max) {
+    if (window.crypto && window.crypto.getRandomValues) {
+      const buf = new Uint32Array(1);
+      window.crypto.getRandomValues(buf);
+      return buf.at(0) % max;
+    }
+    return Math.floor(Math.random() * max);
+  }
+
+  function cryptoShuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = cryptoRandomInt(i + 1);
       const tmp = arr.at(i);
       arr.splice(i, 1, arr.at(j));
       arr.splice(j, 1, tmp);
@@ -118,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function() {
     return arr;
   }
 
-  function smartNonRepeatShuffle(items, getKeyFn, storageKey) {
+  function strictExhaustiveShuffle(items, getKeyFn, storageKey) {
     let seenSet = new Set();
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) || "[]");
@@ -132,21 +146,27 @@ document.addEventListener("DOMContentLoaded", function() {
       else unseen.push(el);
     });
 
-    if (unseen.length < Math.min(24, items.length)) {
+    if (unseen.length === 0) {
       seenSet.clear();
       unseen = items.slice();
       seen = [];
+      showToast("🔄 全庫已完整輪播一輪，開啟全新隨機循環！");
     }
 
-    shufflePure(unseen);
-    shufflePure(seen);
+    cryptoShuffle(unseen);
+    cryptoShuffle(seen);
 
-    const batchSize = Math.min(36, unseen.length);
-    for (let i = 0; i < batchSize; i++) seenSet.add(getKeyFn(unseen.at(i)));
+    const markCount = Math.min(60, unseen.length);
+    for (let i = 0; i < markCount; i++) {
+      seenSet.add(getKeyFn(unseen.at(i)));
+    }
 
     try { localStorage.setItem(storageKey, JSON.stringify(Array.from(seenSet))); } catch(e) {}
     return unseen.concat(seen);
   }
+
+  let currentSortMode = "date-desc";
+  let isApplyingSort = false;
 
   function applySort(mode, forceReshuffle) {
     if (isApplyingSort) return;
@@ -160,10 +180,10 @@ document.addEventListener("DOMContentLoaded", function() {
         const cards = Array.from(grid.children);
         if (mode === "random") {
           if (forceReshuffle) {
-            const ordered = smartNonRepeatShuffle(cards, (c) => {
+            const ordered = strictExhaustiveShuffle(cards, (c) => {
               const im = c.querySelector("img");
               return im ? (im.getAttribute("src") || im.src || "") : String(Math.random());
-            }, "ltx_gif_seen_pool");
+            }, "ltx_gif_strict_seen_v2");
             ordered.forEach(c => grid.appendChild(c));
           }
           return;
@@ -212,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (mode === "random") {
           if (forceReshuffle) {
-            const orderedRows = smartNonRepeatShuffle(rows, (r) => r.dataset.origIdx || r.textContent.slice(0, 40), "ltx_list_seen_pool");
+            const orderedRows = strictExhaustiveShuffle(rows, (r) => r.dataset.origIdx || r.textContent.slice(0, 40), "ltx_list_strict_seen_v2");
             orderedRows.forEach(r => tbody.appendChild(r));
           }
           return;
@@ -250,23 +270,22 @@ document.addEventListener("DOMContentLoaded", function() {
             const cmp = ra.name.localeCompare(rb.name, "ja");
             return mode === "name-asc" ? cmp : -cmp;
           }
-          if (mode === "code-asc" || mode === "code-desc") {
-            if (!ra.code && !rb.code) return ra.orig - ra.orig;
-            if (!ra.code) return 1;
-            if (!rb.code) return -1;
-            const cmp = ra.code.localeCompare(rb.code, "en", { numeric: true });
-            return mode === "code-asc" ? cmp : -cmp;
-          }
-          return ra.orig - rb.orig;
-        });
-        rows.forEach(r => tbody.appendChild(r));
-      }
-    } finally {
-      setTimeout(() => { isApplyingSort = false; }, 30);
-    }
-  }
-
-  const bar = document.createElement("div");
+if (mode === "code-asc" || mode === "code-desc") {
+if (!ra.code && !rb.code) return ra.orig - ra.orig;
+if (!ra.code) return 1;
+if (!rb.code) return -1;
+const cmp = ra.code.localeCompare(rb.code, "en", { numeric: true });
+return mode === "code-asc" ? cmp : -cmp;
+}
+return ra.orig - rb.orig;
+});
+rows.forEach(r => tbody.appendChild(r));
+}
+} finally {
+setTimeout(() => { isApplyingSort = false; }, 30);
+}
+}
+const bar = document.createElement("div");
 bar.id = "ltx-sort-bar";
 bar.innerHTML =
 '日期(倒序)' +
@@ -289,7 +308,6 @@ btn.classList.add("active");
 applySort(btn.dataset.mode, true);
 });
 });
-// 1. 監聽搜尋框與日期篩選器變動，自動維持當前排序狀態
 const targetContainer = isGifWall ? findGifGrid() : document.querySelector("table tbody");
 if (targetContainer) {
 const filterObs = new MutationObserver(() => {
@@ -303,7 +321,6 @@ document.querySelectorAll("input, select").forEach(el => {
 el.addEventListener("input", () => setTimeout(() => applySort(currentSortMode, false), 60));
 el.addEventListener("change", () => setTimeout(() => applySort(currentSortMode, false), 60));
 });
-// 2. 網頁版目錄 (list.html)：點擊番號一鍵複製並彈出氣泡提示
 if (!isGifWall) {
 document.querySelectorAll("table tbody td").forEach(td => {
 const txt = td.textContent.trim();
@@ -317,7 +334,6 @@ navigator.clipboard.writeText(txt).then(() => showToast("📋 已複製番號：
 }
 });
 }
-// 3. 動圖牆燈箱 (Lightbox)：支援鍵盤左右方向鍵與手機左右滑動無縫連看
 if (isGifWall) {
 function stepLightbox(delta) {
 const lb = document.getElementById("lightbox") || document.querySelector(".lightbox");
