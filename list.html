@@ -343,4 +343,187 @@ fetch("cat_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() 
   }
 }).catch(function(){});
 </script>
+<style id="ltx-sort-style">
+  #ltx-sort-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin: 6px 0 10px 0;
+    padding: 0 12px;
+  }
+  #ltx-sort-bar button.sort-btn {
+    background: rgba(255, 255, 255, 0.06);
+    color: #9ca3af;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 3px 11px;
+    height: 26px;
+    line-height: 18px;
+    border-radius: 999px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  #ltx-sort-bar button.sort-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: #f3f4f6;
+  }
+  #ltx-sort-bar button.sort-btn.active {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #10b981;
+    font-weight: 600;
+  }
+</style>
+<script id="ltx-sort-script">
+document.addEventListener("DOMContentLoaded", function() {
+  if (document.getElementById("ltx-sort-bar")) return;
+
+  const dataEl = document.getElementById("gif-data");
+  const isGifWall = !!dataEl;
+  const urlMetaMap = new Map();
+
+  if (isGifWall) {
+    let allItems = [];
+    try { allItems = JSON.parse(dataEl.textContent || "[]"); } catch(e) {}
+    if (Array.isArray(allItems)) {
+      allItems.forEach((it, idx) => {
+        const rawT = String(it.title || "");
+        let actress = "", code = "";
+        const dotPos = rawT.indexOf("·");
+        if (dotPos >= 0) {
+          const rest = rawT.substring(dotPos + 1).trim();
+          const openP = rest.lastIndexOf("("), closeP = rest.lastIndexOf(")");
+          if (openP > 0 && closeP > openP) {
+            actress = rest.substring(0, openP).trim();
+            code = rest.substring(openP + 1, closeP).trim().toUpperCase();
+          } else {
+            actress = rest;
+          }
+        }
+        urlMetaMap.set(String(it.url || "").trim(), { idx: idx, date: String(it.date || ""), actress: actress, code: code });
+      });
+    }
+  }
+
+  function findGifGrid() {
+    const imgs = Array.from(document.querySelectorAll("img")).filter(im => urlMetaMap.has(im.getAttribute("src") || "") || urlMetaMap.has(im.src || ""));
+    if (imgs.length < 2) return null;
+    let p1 = imgs.at(0).parentElement, p2 = imgs.at(1).parentElement;
+    while (p1 && p2 && p1.parentElement !== p2.parentElement) { p1 = p1.parentElement; p2 = p2.parentElement; }
+    return p1 ? p1.parentElement : null;
+  }
+
+  function applySort(mode) {
+    if (isGifWall) {
+      const grid = findGifGrid();
+      if (!grid) return;
+      const cards = Array.from(grid.children);
+      const getInfo = (card) => {
+        const im = card.querySelector("img");
+        if (!im) return { idx: 9999, date: "", actress: "", code: "" };
+        return urlMetaMap.get(im.getAttribute("src") || "") || urlMetaMap.get(im.src || "") || { idx: 9999, date: "", actress: "", code: "" };
+      };
+      cards.sort((a, b) => {
+        const ma = getInfo(a), mb = getInfo(b);
+        if (mode === "date") {
+          const da = ma.date === "unknown date" ? "0000-00-00" : ma.date;
+          const db = mb.date === "unknown date" ? "0000-00-00" : mb.date;
+          return db !== da ? db.localeCompare(da) : ma.idx - mb.idx;
+        }
+        if (mode === "name-asc" || mode === "name-desc") {
+          if (!ma.actress && !mb.actress) return ma.idx - mb.idx;
+          if (!ma.actress) return 1;
+          if (!mb.actress) return -1;
+          const cmp = ma.actress.localeCompare(mb.actress, "ja");
+          return mode === "name-asc" ? cmp : -cmp;
+        }
+        if (mode === "code-asc" || mode === "code-desc") {
+          if (!ma.code && !mb.code) return ma.idx - mb.idx;
+          if (!ma.code) return 1;
+          if (!mb.code) return -1;
+          const cmp = ma.code.localeCompare(mb.code, "en", { numeric: true });
+          return mode === "code-asc" ? cmp : -cmp;
+        }
+        return ma.idx - mb.idx;
+      });
+      cards.forEach(c => grid.appendChild(c));
+    } else {
+      const tbody = document.querySelector("table tbody");
+      if (!tbody) return;
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      if (rows.length === 0) return;
+
+      rows.forEach((tr, i) => { if (!tr.dataset.origIdx) tr.dataset.origIdx = String(i); });
+
+      const parseRow = (tr) => {
+        const cells = Array.from(tr.querySelectorAll("td"));
+        const txtAll = cells.map(c => c.textContent.trim()).join(" ");
+        let dateVal = "", codeVal = "", nameVal = "";
+        const dm = txtAll.match(/(\d{2,4}-\d{1,2}-\d{1,2})/);
+        if (dm) dateVal = dm.at(1);
+        const cm = txtAll.match(/([A-Za-z]{2,6}-\d{2,5})/);
+        if (cm) codeVal = cm.at(1).toUpperCase();
+        for (const c of cells) {
+          const t = c.textContent.trim();
+          if (t && t !== "-" && !t.match(/^\d/) && !t.match(/^[A-Za-z]{2,6}-\d/) && !t.includes("GB") && !t.includes("MB") && !t.includes("PikPak") && !t.includes("開啟")) {
+            nameVal = t.replace(/\s+\d{2}-\d{1,2}-\d{1,2}$/, "").trim();
+            break;
+          }
+        }
+        return { orig: Number(tr.dataset.origIdx || 0), date: dateVal, code: codeVal, name: nameVal };
+      };
+
+      rows.sort((a, b) => {
+        const ra = parseRow(a), rb = parseRow(b);
+        if (mode === "date") {
+          if (rb.date !== ra.date) return rb.date.localeCompare(ra.date);
+          return ra.orig - rb.orig;
+        }
+        if (mode === "name-asc" || mode === "name-desc") {
+          if (!ra.name && !rb.name) return ra.orig - rb.orig;
+          if (!ra.name) return 1;
+          if (!rb.name) return -1;
+          const cmp = ra.name.localeCompare(rb.name, "ja");
+          return mode === "name-asc" ? cmp : -cmp;
+        }
+        if (mode === "code-asc" || mode === "code-desc") {
+          if (!ra.code && !rb.code) return ra.orig - rb.orig;
+          if (!ra.code) return 1;
+          if (!rb.code) return -1;
+          const cmp = ra.code.localeCompare(rb.code, "en", { numeric: true });
+          return mode === "code-asc" ? cmp : -cmp;
+        }
+        return ra.orig - rb.orig;
+      });
+      rows.forEach(r => tbody.appendChild(r));
+    }
+  }
+
+  const bar = document.createElement("div");
+  bar.id = "ltx-sort-bar";
+  bar.innerHTML =
+    '<button type="button" class="sort-btn active" data-mode="date">日期</button>' +
+    '<button type="button" class="sort-btn" data-mode="name-asc">名字 A-Z</button>' +
+    '<button type="button" class="sort-btn" data-mode="name-desc">名字 Z-A</button>' +
+    '<button type="button" class="sort-btn" data-mode="code-asc">番號 A-Z</button>' +
+    '<button type="button" class="sort-btn" data-mode="code-desc">番號 Z-A</button>';
+
+  const anchor = isGifWall ? findGifGrid() : document.querySelector("table");
+  if (anchor && anchor.parentElement) {
+    anchor.parentElement.insertBefore(bar, anchor);
+  } else {
+    document.body.insertBefore(bar, document.body.firstChild);
+  }
+
+  bar.querySelectorAll(".sort-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      bar.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      applySort(btn.dataset.mode);
+    });
+  });
+});
+</script>
 </body></html>
