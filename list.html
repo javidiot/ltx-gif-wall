@@ -225,77 +225,70 @@ rendered=end;
 new IntersectionObserver(function(es){ if(es.isIntersecting)appendCards(); },{rootMargin:"500px"}).observe(document.getElementById("more"));
 initRecentDates(); initHotChips(); saveFavs(); var usp=new URLSearchParams(window.location.search);if(usp.get("q")){qInput.value=usp.get("q");clrBtn.classList.add("show");}if(usp.get("k")==="4k"){only4k=true;syncFilterBtns();}if(usp.get("m")==="recent"){onlyRecent=true;syncFilterBtns();}
 runFilter();
-</script><style id="ltx-sort-style">
-#ltx-sort-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 16px 8px 16px;width:100%;}
-#ltx-sort-bar button{background:rgba(255,255,255,.07);color:#9ca3af;border:1px solid rgba(255,255,255,.14);padding:3px 11px;height:26px;border-radius:999px;font-size:12px;cursor:pointer;}
-#ltx-sort-bar button.active{background:#10b981;color:#fff;border-color:#10b981;font-weight:600;}
-</style>
-<script id="ltx-sort-script">
-document.addEventListener("DOMContentLoaded",function(){
-if(document.getElementById("ltx-sort-bar"))return;
-const bar=document.createElement("div");bar.id="ltx-sort-bar";
-bar.innerHTML='<button class="active" data-m="date-desc">日期(倒序)</button><button data-m="date-asc">日期(順序)</button><button data-m="name-asc">名字(A-Z)</button><button data-m="name-desc">名字(Z-A)</button><button data-m="code-asc">番號(A-Z)</button><button data-m="code-desc">番號(Z-A)</button><button id="ltxRnd" data-m="random">隨機</button>';
-const dp=Array.from(document.querySelectorAll("button")).find(b=>b.textContent&&(b.textContent.includes("unknown date")||b.textContent.includes("全部")));
-if(dp&&dp.parentElement&&dp.parentElement.parentElement){dp.parentElement.parentElement.appendChild(bar);}else if(dp&&dp.parentElement){dp.parentElement.insertAdjacentElement("afterend",bar);}else{const tb=document.querySelector("table");if(tb)tb.parentElement.insertBefore(bar,tb);else document.body.prepend(bar);}bar.querySelectorAll("button").forEach(btn=>{btn.onclick=()=>{
-bar.querySelectorAll("button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
-const m=btn.dataset.m,rnd=document.getElementById("ltxRnd");
-const tbody=document.querySelector("table tbody");
-if(tbody){
-  const rows=Array.from(tbody.querySelectorAll("tr"));if(rows.length<2)return;
-  rows.forEach((tr,i)=>{if(!tr.dataset.oi)tr.dataset.oi=String(i);});
-  if(m==="random"){
-    let seen=new Set(JSON.parse(localStorage.getItem("ltx_list_deck_v9")||"[]"));
-    let un=rows.filter(el=>!seen.has(el.dataset.oi));if(un.length===0){seen.clear();un=rows.slice();}
-    for(let i=un.length-1;i>0;i--){const b=new Uint32Array(1);window.crypto.getRandomValues(b);const j=b.at(0)%(i+1);const t=un.at(i);un.splice(i,1,un.at(j));un.splice(j,1,t);}
-    const pick=un.slice(0,40);pick.forEach(el=>{seen.add(el.dataset.oi);el.style.display="";});
-    rows.filter(el=>!pick.includes(el)).forEach(el=>{el.style.display="none";});
-    localStorage.setItem("ltx_list_deck_v9",JSON.stringify(Array.from(seen)));
-    if(rnd)rnd.textContent="隨機 ("+Math.max(0,un.length-pick.length)+"/"+rows.length+")";
-    pick.forEach(el=>tbody.appendChild(el));return;
-  }
-  rows.forEach(el=>{if(el.style.display==="none")el.style.display="";});if(rnd)rnd.textContent="隨機";
-  rows.sort((a,b)=>{
-    const ta=a.textContent||"",tb=b.textContent||"";
-    const da=(ta.match(/(\d{2,4}-\d{1,2}-\d{1,2})/)||["",""]).at(1),db=(tb.match(/(\d{2,4}-\d{1,2}-\d{1,2})/)||["",""]).at(1);
-    const ca=(ta.match(/([A-Za-z]{2,6}-\d{2,5})/)||["",""]).at(1).toUpperCase(),cb=(tb.match(/([A-Za-z]{2,6}-\d{2,5})/)||["",""]).at(1).toUpperCase();
-    if(m==="date-desc")return(db||"0000").localeCompare(da||"0000")||Number(a.dataset.oi)-Number(b.dataset.oi);
-    if(m==="date-asc")return(da||"9999").localeCompare(db||"9999")||Number(b.dataset.oi)-Number(a.dataset.oi);
-    if(m==="code-asc"||m==="code-desc"){if(!ca)return 1;if(!cb)return -1;const c=ca.localeCompare(cb,"en",{numeric:true});return m==="code-asc"?c:-c;}
-    const na=(a.querySelector("td")?.textContent||"").trim(),nb=(b.querySelector("td")?.textContent||"").trim();
-    const c=na.localeCompare(nb,"ja");return m==="name-asc"?c:-c;
-  });
-  rows.forEach(r=>tbody.appendChild(r));return;
-}
-if(typeof rawData==="undefined"||!Array.isArray(rawData))return;
-rawData.forEach((it,i)=>{if(it._oi===undefined)it._oi=i;});
-if(m==="random"){
-  let seen=new Set(JSON.parse(localStorage.getItem("ltx_raw_deck_v9")||"[]"));
-  let un=rawData.filter(it=>!seen.has(it.url));
-  if(un.length===0){seen.clear();un=rawData.slice();}
-  for(let i=un.length-1;i>0;i--){const b=new Uint32Array(1);window.crypto.getRandomValues(b);const j=b.at(0)%(i+1);const t=un.at(i);un.splice(i,1,un.at(j));un.splice(j,1,t);}
-  const batch=un.slice(0,30);
-  batch.forEach(it=>seen.add(it.url));
-  localStorage.setItem("ltx_raw_deck_v9",JSON.stringify(Array.from(seen)));
-  if(rnd)rnd.textContent="隨機 ("+Math.max(0,un.length-batch.length)+"/"+rawData.length+")";
-  const rest=rawData.filter(it=>!batch.includes(it));
-  const nextOrder=batch.concat(rest);
-  rawData.splice(0,rawData.length);
-  nextOrder.forEach(it=>rawData.push(it));
-}else{
-  if(rnd)rnd.textContent="隨機";
-  const parseT=(t)=>{let act="",cd="";const d=t.indexOf("·");if(d>=0){const r=t.substring(d+1).trim();const op=r.lastIndexOf("("),cp=r.lastIndexOf(")");if(op>0&&cp>op){act=r.substring(0,op).trim();cd=r.substring(op+1,cp).trim().toUpperCase();}else{act=r;}}return{act:act,cd:cd};};
-  rawData.sort((a,b)=>{
-    const pa=parseT(String(a.title||"")),pb=parseT(String(b.title||""));
-    if(m==="date-desc")return(b.date==="unknown date"?"0000":b.date).localeCompare(a.date==="unknown date"?"0000":a.date)||a._oi-b._oi;
-    if(m==="date-asc")return(a.date==="unknown date"?"9999":a.date).localeCompare(b.date==="unknown date"?"9999":b.date)||b._oi-a._oi;
-    if(m==="name-asc"||m==="name-desc"){if(!pa.act&&!pb.act)return a._oi-b._oi;if(!pa.act)return 1;if(!pb.act)return -1;const c=pa.act.localeCompare(pb.act,"ja");return m==="name-asc"?c:-c;}
-    if(m==="code-asc"||m==="code-desc"){if(!pa.cd&&!pb.cd)return a._oi-b._oi;if(!pa.cd)return 1;if(!pb.cd)return -1;const c=pa.cd.localeCompare(pb.cd,"en",{numeric:true});return m==="code-asc"?c:-c;}
-    return a._oi-b._oi;
-  });
-}
-if(typeof resetAndRender==="function")resetAndRender();
-window.scrollTo({top:0,behavior:"smooth"});
-};});});
 </script>
-</body>
-</html>
+<style id="ltx-sort-style">#ltx-sort-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 16px 8px 16px;width:100%;}#ltx-sort-bar button{background:rgba(255,255,255,.07);color:#9ca3af;border:1px solid rgba(255,255,255,.14);padding:3px 11px;height:26px;border-radius:999px;font-size:12px;cursor:pointer;}#ltx-sort-bar button.active{background:#10b981;color:#fff;border-color:#10b981;font-weight:600;}</style>
+<script id="ltx-sort-script">
+window.addEventListener("load", function() {
+  if (document.getElementById("ltx-sort-bar")) return;
+  const hc = document.getElementById("hotChips");
+  const bar = document.createElement("div");
+  bar.id = "ltx-sort-bar";
+  bar.innerHTML = '<button class="active" data-m="date-desc">日期(倒序)</button><button data-m="date-asc">日期(順序)</button><button data-m="name-asc">名字(A-Z)</button><button data-m="name-desc">名字(Z-A)</button><button data-m="code-asc">番號(A-Z)</button><button data-m="code-desc">番號(Z-A)</button><button id="ltxRnd" data-m="random">隨機</button>';
+  if (hc && hc.parentElement) hc.parentElement.appendChild(bar);
+  else document.body.prepend(bar);
+
+  if (typeof LIST === "undefined" || !Array.isArray(LIST)) return;
+  LIST.forEach((it, i) => { if (it._oi === undefined) it._oi = i; });
+
+  bar.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", function() {
+      bar.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const m = btn.dataset.m;
+      const rnd = document.getElementById("ltxRnd");
+
+      if (m === "random") {
+        let seen = new Set(JSON.parse(localStorage.getItem("ltx_cat_deck_v1") || "[]"));
+        const getKey = (x) => String(x.f || x.file || x.c || x._oi);
+        let un = LIST.filter(it => !seen.has(getKey(it)));
+        if (un.length === 0) { seen.clear(); un = LIST.slice(); }
+        for (let i = un.length - 1; i > 0; i--) {
+          const b = new Uint32Array(1); window.crypto.getRandomValues(b);
+          const j = b.at(0) % (i + 1);
+          const tmp = un.at(i); un.splice(i, 1, un.at(j)); un.splice(j, 1, tmp);
+        }
+        const batch = un.slice(0, 40);
+        batch.forEach(it => seen.add(getKey(it)));
+        localStorage.setItem("ltx_cat_deck_v1", JSON.stringify(Array.from(seen)));
+        if (rnd) rnd.textContent = "隨機 (" + Math.max(0, un.length - batch.length) + "/" + LIST.length + ")";
+
+        const rest = LIST.filter(it => !batch.includes(it));
+        const nextOrder = batch.concat(rest);
+        LIST.splice(0, LIST.length);
+        nextOrder.forEach(it => LIST.push(it));
+      } else {
+        if (rnd) rnd.textContent = "隨機";
+        const getVal = (obj, keys) => {
+          for (const k of keys) { if (obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== "" && String(obj[k]).trim() !== "-") return String(obj[k]).trim(); }
+          return "";
+        };
+        LIST.sort((a, b) => {
+          const da = getVal(a, ["d", "date", "dt"]), db = getVal(b, ["d", "date", "dt"]);
+          const na = getVal(a, ["a", "act", "actress", "n", "name", "fld", "folder"]), nb = getVal(b, ["a", "act", "actress", "n", "name", "fld", "folder"]);
+          const ca = getVal(a, ["c", "code", "f", "file"]).toUpperCase(), cb = getVal(b, ["c", "code", "f", "file"]).toUpperCase();
+          if (m === "date-desc") return (db || "00-00-00").localeCompare(da || "00-00-00") || a._oi - b._oi;
+          if (m === "date-asc") return (da || "99-99-99").localeCompare(db || "99-99-99") || b._oi - a._oi;
+          if (m === "name-asc" || m === "name-desc") { if (!na && !nb) return a._oi - b._oi; if (!na) return 1; if (!nb) return -1; const cmp = na.localeCompare(nb, "ja"); return m === "name-asc" ? cmp : -cmp; }
+          if (m === "code-asc" || m === "code-desc") { if (!ca && !cb) return a._oi - b._oi; if (!ca) return 1; if (!cb) return -1; const cmp = ca.localeCompare(cb, "en", { numeric: true }); return m === "code-asc" ? cmp : -cmp; }
+          return a._oi - b._oi;
+        });
+      }
+
+      if (typeof rndMode !== "undefined") rndMode = false;
+      if (typeof runFilter === "function") runFilter();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+});
+</script>
+</body></html>
