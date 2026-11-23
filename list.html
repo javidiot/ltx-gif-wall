@@ -277,7 +277,7 @@ window.addEventListener("load", function() {
           const na = getVal(a, ["a", "act", "actress", "n", "name", "fld", "folder"]), nb = getVal(b, ["a", "act", "actress", "n", "name", "fld", "folder"]);
           const ca = getVal(a, ["c", "code", "f", "file"]).toUpperCase(), cb = getVal(b, ["c", "code", "f", "file"]).toUpperCase();
           if (m === "date-desc") return (db || "00-00-00").localeCompare(da || "00-00-00") || a._oi - b._oi;
-          if (m === "date-asc") return (da || "99-99-99").localeCompare(db || "99-99-99") || b._oi - a._oi;
+          if (m === "date-asc") return (da || "00-00-00").localeCompare(db || "00-00-00") || b._oi - a._oi;
           if (m === "name-asc" || m === "name-desc") { if (!na && !nb) return a._oi - b._oi; if (!na) return 1; if (!nb) return -1; const cmp = na.localeCompare(nb, "ja"); return m === "name-asc" ? cmp : -cmp; }
           if (m === "code-asc" || m === "code-desc") { if (!ca && !cb) return a._oi - b._oi; if (!ca) return 1; if (!cb) return -1; const cmp = ca.localeCompare(cb, "en", { numeric: true }); return m === "code-asc" ? cmp : -cmp; }
           return a._oi - b._oi;
