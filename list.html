@@ -487,6 +487,17 @@ window.addEventListener("load", function() {
       });
     }
   });
+  function applyAutoFitGrid() {
+    const anyCard = document.querySelector(".card, .item, [class*='card'], [class*='item']");
+    if (anyCard && anyCard.parentElement) {
+      const p = anyCard.parentElement;
+      p.style.setProperty("align-items", "start", "important");
+      p.style.setProperty("gap", "10px", "important");
+    }
+  }
+  setTimeout(applyAutoFitGrid, 150);
+  const gridMo = new MutationObserver(applyAutoFitGrid);
+  gridMo.observe(document.body, { childList: true, subtree: true });
   const bakBtn = document.getElementById("ltx-fav-bak-btn");
   if (bakBtn) {
     bakBtn.addEventListener("click", function() {
