@@ -486,7 +486,7 @@ window.addEventListener("load", function() {
 
       LIST.length = 0;
       Array.prototype.push.apply(LIST, out);
-      if (typeof runFilter === "function") runFilter();
+      if (typeof rndMode !== "undefined") rndMode = false; if (typeof sortBy !== "undefined") sortBy = "custom"; if (typeof runFilter === "function") runFilter();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   });
@@ -498,7 +498,7 @@ window.addEventListener("load", function() {
       if (inp) {
         inp.value = urlQ;
         inp.dispatchEvent(new Event("input", { bubbles: true }));
-        if (typeof runFilter === "function") runFilter();
+        if (typeof rndMode !== "undefined") rndMode = false; if (typeof sortBy !== "undefined") sortBy = "custom"; if (typeof runFilter === "function") runFilter();
       }
     }, 250);
   }
