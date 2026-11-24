@@ -157,7 +157,7 @@ var on=!!favs[fn]; t.classList.toggle("faved", on); t.textContent=on?"❤️":"�
 if(onlyFav && !on) runFilter();
 }
 };
-function runFilter(){
+function runFilter(){ if(window._ltxCustomSort){ sortBy="custom"; rndMode=false; }
 var kw=(qInput.value||"").trim().toLowerCase();
 curList=LIST.filter(function(x){
 if(onlyRecent && recentDates.indexOf(x.u)===-1) return false;
@@ -486,7 +486,7 @@ window.addEventListener("load", function() {
 
       LIST.length = 0;
       Array.prototype.push.apply(LIST, out);
-      if (typeof rndMode !== "undefined") rndMode = false; if (typeof sortBy !== "undefined") sortBy = "custom"; if (typeof runFilter === "function") runFilter();
+      if (typeof rndMode !== "undefined") rndMode = false; if (typeof sortBy !== "undefined") sortBy = "custom"; window._ltxCustomSort = true; if (typeof runFilter === "function") runFilter();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   });
@@ -498,7 +498,7 @@ window.addEventListener("load", function() {
       if (inp) {
         inp.value = urlQ;
         inp.dispatchEvent(new Event("input", { bubbles: true }));
-        if (typeof rndMode !== "undefined") rndMode = false; if (typeof sortBy !== "undefined") sortBy = "custom"; if (typeof runFilter === "function") runFilter();
+        if (typeof rndMode !== "undefined") rndMode = false; if (typeof sortBy !== "undefined") sortBy = "custom"; window._ltxCustomSort = true; if (typeof runFilter === "function") runFilter();
       }
     }, 250);
   }
