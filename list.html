@@ -352,8 +352,8 @@ fetch("cat_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() 
 .card, .item, [class*="card"] {
   height: auto !important;
   min-height: 0 !important;
-  padding: 10px 12px !important;
-  border-radius: 10px !important;
+  padding: 8px 10px !important;
+  border-radius: 0px !important;
   background: rgba(24, 28, 38, 0.88) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   display: flex !important;
@@ -387,14 +387,14 @@ fetch("cat_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() 
 @media (max-width: 499px) { .ltx-masonry-wrap { column-count: 1 !important; } }
 .ltx-masonry-wrap {
   display: block !important;
-  column-gap: 10px !important;
+  column-gap: 1px !important; background: #0f172a !important; border: 1px solid rgba(255,255,255,0.12) !important; border-radius: 8px !important; overflow: hidden !important;
 }
 .ltx-masonry-wrap > * {
   break-inside: avoid !important;
   page-break-inside: avoid !important;
   display: inline-flex !important;
   width: 100% !important;
-  margin-bottom: 10px !important;
+  margin-bottom: 1px !important;
   box-sizing: border-box !important;
 }
 </style>
@@ -508,7 +508,7 @@ window.addEventListener("load", function() {
     if (anyCard && anyCard.parentElement) {
       const p = anyCard.parentElement;
       p.classList.add("ltx-masonry-wrap");
-      p.style.setProperty("gap", "10px", "important");
+      p.style.setProperty("gap", "1px", "important");
     }
   }
   setTimeout(applyAutoFitGrid, 150);
