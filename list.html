@@ -397,6 +397,26 @@ fetch("cat_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() 
   margin-bottom: 1px !important;
   box-sizing: border-box !important;
 }
+.ltx-masonry-wrap {
+  column-gap: 1px !important;
+  gap: 1px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+.ltx-masonry-wrap > * {
+  margin: 0 0 1px 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  padding: 7px 10px !important;
+  background: #131720 !important;
+  vertical-align: top !important;
+}
+.ltx-masonry-wrap > *:hover {
+  background: #1a202c !important;
+  transform: none !important;
+}
 </style>
 <script id="ltx-sort-script">
 window.addEventListener("load", function() {
