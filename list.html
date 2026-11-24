@@ -344,23 +344,7 @@ fetch("cat_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() 
 }).catch(function(){});
 </script>
 
-<style id="ltx-sort-style">
-#ltx-sort-bar {
-  position: sticky; top: 0; z-index: 999;
-  background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(8px);
-  padding: 8px 12px; margin: 8px 0 10px 0; border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
-}
-#ltx-sort-bar button {
-  background: rgba(255, 255, 255, 0.08); color: #e2e8f0; border: 1px solid rgba(255, 255, 255, 0.16);
-  padding: 5px 11px; border-radius: 999px; font-size: 12px; cursor: pointer;
-}
-#ltx-sort-bar button.active {
-  background: #0284c7; color: #fff; border-color: #38bdf8; font-weight: 600;
-}
-#ltx-fav-bak-btn { margin-left: auto; background: #065f46 !important; border-color: #10b981 !important; color: #ecfdf5 !important; }
-</style>
+<style id="ltx-sort-style">#ltx-sort-bar{position:sticky;top:0;z-index:999;background:rgba(11,13,18,0.86);backdrop-filter:blur(10px);padding:6px 4px;margin:4px 0 8px 0;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;flex-wrap:wrap;gap:5px;align-items:center;}#ltx-sort-bar button{background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:999px;font-size:12px;line-height:1.3;cursor:pointer;transition:all .15s;}#ltx-sort-bar button:hover{background:rgba(255,255,255,0.14);color:#fff;}#ltx-sort-bar button.active{background:#0ea5e9;color:#082f49;border-color:#38bdf8;font-weight:700;}#ltx-fav-bak-btn{margin-left:auto;background:rgba(16,185,129,0.14)!important;border-color:rgba(52,211,153,0.35)!important;color:#6ee7b7!important;}</style>
 <script id="ltx-sort-script">
 window.addEventListener("load", function() {
   if (document.getElementById("ltx-sort-bar")) return;
