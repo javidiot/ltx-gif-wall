@@ -418,6 +418,38 @@ window.addEventListener("load", function() {
     });
   });
 
+  const urlQ = new URLSearchParams(window.location.search).get("q");
+  if (urlQ) {
+    setTimeout(function() {
+      const inp = document.querySelector("input[type='search'], input[type='text']");
+      if (inp) {
+        inp.value = urlQ;
+        inp.dispatchEvent(new Event("input", { bubbles: true }));
+        if (typeof runFilter === "function") runFilter();
+      }
+    }, 250);
+  }
+
+  document.addEventListener("click", function(e) {
+    const t = e.target;
+    if (!t || t.tagName === "A" || t.tagName === "BUTTON" || t.tagName === "INPUT") return;
+    const rawTxt = (t.textContent || "").trim();
+    if (/^[A-Z]{2,6}-\d{2,5}$/i.test(rawTxt)) {
+      navigator.clipboard.writeText(rawTxt.toUpperCase()).then(function() {
+        let toast = document.getElementById("ltx-copy-toast");
+        if (!toast) {
+          toast = document.createElement("div");
+          toast.id = "ltx-copy-toast";
+          toast.style.cssText = "position:fixed;bottom:20px;right:20px;z-index:9999;background:#0f172a;color:#38bdf8;border:1px solid #0284c7;padding:6px 14px;border-radius:999px;font-size:12px;transition:opacity .2s;";
+          document.body.appendChild(toast);
+        }
+        toast.textContent = "已複製番號：" + rawTxt.toUpperCase();
+        toast.style.opacity = "1";
+        clearTimeout(toast._t);
+        toast._t = setTimeout(function() { toast.style.opacity = "0"; }, 1200);
+      });
+    }
+  });
   const bakBtn = document.getElementById("ltx-fav-bak-btn");
   if (bakBtn) {
     bakBtn.addEventListener("click", function() {
