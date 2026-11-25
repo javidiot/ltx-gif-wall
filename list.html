@@ -344,31 +344,7 @@ fetch("cat_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() 
 }).catch(function(){});
 </script>
 
-<style id="ltx-sort-style">#ltx-sort-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    background: rgba(13, 16, 23, 0.9);
-    border-bottom: 1px solid #222736;
-}
-#ltx-sort-bar button, .ltx-sbtn {
-    background: #1a1f2c;
-    color: #cbd5e1;
-    border: 1px solid #2f374b;
-    border-radius: 99px;
-    padding: 4px 12px;
-    font-size: 12.5px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .15s;
-}
-#ltx-sort-bar button:hover, #ltx-sort-bar button.active, .ltx-sbtn:hover, .ltx-sbtn.active {
-    background: #2563eb;
-    color: #ffffff;
-    border-color: #3b82f6;
-}</style>
+<style id="ltx-sort-style">#ltx-sort-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 16px;background:rgba(13,16,23,.9);border-bottom:1px solid #222736}#ltx-sort-bar button,.ltx-sbtn{background:#1a1f2c;color:#cbd5e1;border:1px solid #2f374b;border-radius:99px;padding:4px 12px;font-size:12px;cursor:pointer}#ltx-sort-bar button:hover,#ltx-sort-bar button.active,.ltx-sbtn:hover,.ltx-sbtn.active{background:#2563eb;color:#fff;border-color:#3b82f6}</style>
 <script id="ltx-sort-script">
 window.addEventListener("load", function() {
   if (document.getElementById("ltx-sort-bar")) return;
@@ -529,82 +505,3 @@ const bakBtn = document.getElementById("ltx-fav-bak-btn"); if (bakBtn) { bakBtn.
 </script>
 </body>
 </html>
-<script>(function(){
-    function initCompactListUI(){
-        var topRow = document.querySelector('.top-row');
-        var chipRows = document.querySelectorAll('.chip-row');
-        if (topRow && chipRows.length > 0 && !document.getElementById('ltx-more-filter-btn')) {
-            var btn = document.createElement('button');
-            btn.id = 'ltx-more-filter-btn';
-            btn.className = 'ltx-more-filter-btn';
-            btn.type = 'button';
-            btn.textContent = '🎛️ 篩選條件 ▾';
-            btn.onclick = function(){
-                var isOpen = chipRows[0].classList.contains('ltx-open');
-                for (var i = 0; i < chipRows.length; i++) {
-                    if (isOpen) chipRows[i].classList.remove('ltx-open');
-                    else chipRows[i].classList.add('ltx-open');
-                }
-                btn.textContent = isOpen ? '🎛️ 篩選條件 ▾' : '🎛️ 收合篩選 ▴';
-            };
-            topRow.appendChild(btn);
-        }
-
-        function enhanceCards(){
-            var cards = document.querySelectorAll('#grid .card');
-            for (var i = 0; i < cards.length; i++) {
-                var c = cards[i];
-                if (c.dataset.ltxCompact) continue;
-                c.dataset.ltxCompact = '1';
-
-                var tit = c.querySelector('.title');
-                var actEl = c.querySelector('.actress');
-                var pubEl = c.querySelector('.pub');
-                var bot = c.querySelector('.c-bot');
-                var acts = c.querySelector('.actions');
-
-                if (tit && tit.textContent) {
-                    c.title = tit.textContent;
-                }
-
-                if (bot && !c.querySelector('.ltx-sub-line')) {
-                    var sub = document.createElement('div');
-                    sub.className = 'ltx-sub-line';
-                    var parts = [];
-                    if (actEl && actEl.textContent) parts.push(actEl.textContent);
-                    if (pubEl && pubEl.textContent) parts.push(pubEl.textContent);
-                    if (parts.length > 0) {
-                        sub.textContent = parts.join(' · ');
-                        bot.insertBefore(sub, bot.firstChild);
-                    }
-                }
-
-                if (acts && tit && tit.textContent && !acts.querySelector('.ltx-detail-toggle')) {
-                    var dBtn = document.createElement('button');
-                    dBtn.type = 'button';
-                    dBtn.className = 'mini-btn ltx-detail-toggle';
-                    dBtn.textContent = '📄 片名';
-                    dBtn.title = '展開/收合完整片名';
-                    (function(cardRef, btnRef){
-                        btnRef.onclick = function(e){
-                            e.stopPropagation();
-                            var shown = cardRef.classList.toggle('show-detail');
-                            btnRef.textContent = shown ? '收合' : '📄 片名';
-                        };
-                    })(c, dBtn);
-                    acts.appendChild(dBtn);
-                }
-            }
-        }
-
-        enhanceCards();
-        var gridEl = document.getElementById('grid');
-        if (gridEl && window.MutationObserver) {
-            var obs = new MutationObserver(function(){ enhanceCards(); });
-            obs.observe(gridEl, { childList: true });
-        }
-    }
-
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCompactListUI);
-    else initCompactListUI();
-})();</script>rn
