@@ -344,7 +344,7 @@ fetch("cat_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() 
 }).catch(function(){});
 </script>
 
-<style id="ltx-sort-style">#ltx-sort-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 16px;background:rgba(13,16,23,.9);border-bottom:1px solid #222736}#ltx-sort-bar button,.ltx-sbtn{background:#1a1f2c;color:#cbd5e1;border:1px solid #2f374b;border-radius:99px;padding:4px 12px;font-size:12px;cursor:pointer}#ltx-sort-bar button:hover,#ltx-sort-bar button.active,.ltx-sbtn:hover,.ltx-sbtn.active{background:#2563eb;color:#fff;border-color:#3b82f6}</style>
+<style id="ltx-sort-style">#ltx-sort-bar{position:sticky;top:0;z-index:999;background:rgba(11,13,18,0.86);backdrop-filter:blur(10px);padding:6px 4px;margin:4px 0 8px 0;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;flex-wrap:wrap;gap:5px;align-items:center;}#ltx-sort-bar button{background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:999px;font-size:12px;line-height:1.3;cursor:pointer;transition:all .15s;}#ltx-sort-bar button:hover{background:rgba(255,255,255,0.14);color:#fff;}#ltx-sort-bar button.active{background:#0ea5e9;color:#082f49;border-color:#38bdf8;font-weight:700;}#ltx-fav-bak-btn{margin-left:auto;background:rgba(16,185,129,0.14)!important;border-color:rgba(52,211,153,0.35)!important;color:#6ee7b7!important;}</style>
 <script id="ltx-sort-script">
 window.addEventListener("load", function() {
   if (document.getElementById("ltx-sort-bar")) return;
@@ -390,7 +390,7 @@ window.addEventListener("load", function() {
       } else {
         if (rnd) rnd.textContent = "隨機";
         out = masterList.slice().sort((a, b) => {
-          const da = String(a.u || ""), db = String(b.u || "");
+          const da = String(a.d || ""), db = String(b.d || "");
           const na = String(a.a || ""), nb = String(b.a || "");
           const ca = String(a.c || a.f || "").toUpperCase(), cb = String(b.c || b.f || "").toUpperCase();
           if (m === "date-desc") return db.localeCompare(da) || a._oi - b._oi;
@@ -413,94 +413,36 @@ window.addEventListener("load", function() {
 
       LIST.length = 0;
       Array.prototype.push.apply(LIST, out);
-      if (typeof rndMode !== "undefined") rndMode = false; if (typeof sortBy !== "undefined") sortBy = "custom"; window._ltxCustomSort = true; if (typeof runFilter === "function") runFilter();
+      if (typeof runFilter === "function") runFilter();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   });
 
-  const urlQ = new URLSearchParams(window.location.search).get("q");
-  if (urlQ) {
-    setTimeout(function() {
-      const inp = document.querySelector("input[type='search'], input[type='text']");
-      if (inp) {
-        inp.value = urlQ;
-        inp.dispatchEvent(new Event("input", { bubbles: true }));
-        if (typeof rndMode !== "undefined") rndMode = false; if (typeof sortBy !== "undefined") sortBy = "custom"; window._ltxCustomSort = true; if (typeof runFilter === "function") runFilter();
-      }
-    }, 250);
-  }
-
-  document.addEventListener("click", function(e) {
-    const t = e.target;
-    if (!t || t.tagName === "A" || t.tagName === "BUTTON" || t.tagName === "INPUT") return;
-    const rawTxt = (t.textContent || "").trim();
-    if (/^[A-Z]{2,6}-\d{2,5}$/i.test(rawTxt)) {
-      navigator.clipboard.writeText(rawTxt.toUpperCase()).then(function() {
-        let toast = document.getElementById("ltx-copy-toast");
-        if (!toast) {
-          toast = document.createElement("div");
-          toast.id = "ltx-copy-toast";
-          toast.style.cssText = "position:fixed;bottom:20px;right:20px;z-index:9999;background:#0f172a;color:#38bdf8;border:1px solid #0284c7;padding:6px 14px;border-radius:999px;font-size:12px;transition:opacity .2s;";
-          document.body.appendChild(toast);
+  const bakBtn = document.getElementById("ltx-fav-bak-btn");
+  if (bakBtn) {
+    bakBtn.addEventListener("click", function() {
+      const choice = prompt("輸入 1 匯出收藏備份（複製 JSON），輸入 2 貼上 JSON 還原收藏：", "1");
+      if (choice === "1") {
+        const dump = {};
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && (k.includes("fav") || k.includes("star") || k.includes("like"))) dump[k] = localStorage.getItem(k);
         }
-        toast.textContent = "已複製番號：" + rawTxt.toUpperCase();
-        toast.style.opacity = "1";
-        clearTimeout(toast._t);
-        toast._t = setTimeout(function() { toast.style.opacity = "0"; }, 1200);
-      });
-    }
-  });
-  function applyAutoFitGrid() {
-    const anyCard = document.querySelector(".card, .item, [class*='card'], [class*='item']");
-    if (anyCard && anyCard.parentElement) {
-      const p = anyCard.parentElement;
-      p.classList.add("ltx-masonry-wrap");
-      p.style.setProperty("gap", "1px", "important");
-    }
+        const jsonStr = JSON.stringify(dump);
+        navigator.clipboard.writeText(jsonStr).then(() => alert("✅ 收藏紀錄已複製到剪貼簿！")).catch(() => prompt("請全選複製以下備份代碼：", jsonStr));
+      } else if (choice === "2") {
+        const imp = prompt("請貼上先前備份的 JSON 代碼：");
+        if (imp) {
+          try {
+            const obj = JSON.parse(imp);
+            Object.keys(obj).forEach(k => localStorage.setItem(k, obj[k]));
+            alert("✅ 收藏已成功還原！即將重新整理頁面。");
+            location.reload();
+          } catch (e) { alert("❌ 格式錯誤，請確認貼上完整的 JSON 備份代碼。"); }
+        }
+      }
+    });
   }
-  setTimeout(applyAutoFitGrid, 150);
-  const gridMo = new MutationObserver(applyAutoFitGrid);
-  gridMo.observe(document.body, { childList: true, subtree: true });
-  function openCloudFavMenu(scopeTag) {
-  const act = prompt("【" + scopeTag + " 收藏同步】\n1 = 複製本地備份 JSON\n2 = 貼上 JSON 還原\n3 = ☁️ 上傳收藏至雲端（供手機/他機同步）\n4 = ☁️ 從雲端拉取最新收藏", "3");
-  if (!act) return;
-  const dump = {};
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k && (k.includes("fav") || k.includes("star") || k.includes("like") || k.includes("gif"))) dump[k] = localStorage.getItem(k);
-  }
-  if (act === "1") {
-    const j = JSON.stringify(dump);
-    navigator.clipboard.writeText(j).then(() => alert("✅ 已複製到本地剪貼簿！")).catch(() => prompt("請全選複製：", j));
-  } else if (act === "2") {
-    const p = prompt("請貼上備份 JSON：");
-    if (p) { try { const o = JSON.parse(p); Object.keys(o).forEach(k => localStorage.setItem(k, o[k])); alert("✅ 還原成功！"); location.reload(); } catch(e) { alert("❌ 格式錯誤"); } }
-  } else if (act === "3" || act === "4") {
-    let tk = localStorage.getItem("ltx_gh_sync_tk") || "";
-    if (!tk) { tk = prompt("請輸入 GitHub Token（僅存於本機瀏覽器）："); if (tk) localStorage.setItem("ltx_gh_sync_tk", tk.trim()); }
-    if (!tk) return;
-    const apiUrl = "https://github.com";
-    const hdrs = { "Authorization": "token " + tk.trim(), "Accept": "application/vnd.github.v3+json" };
-    if (act === "3") {
-      fetch(apiUrl, { headers: hdrs }).then(r => r.ok ? r.json() : null).then(meta => {
-        const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(dump, null, 2))));
-        const body = { message: "Cloud sync favorites", content: b64 };
-        if (meta && meta.sha) body.sha = meta.sha;
-        return fetch(apiUrl, { method: "PUT", headers: Object.assign({ "Content-Type": "application/json" }, hdrs), body: JSON.stringify(body) });
-      }).then(r => { if (r && r.ok) alert("☁️ 已成功將收藏上傳至雲端！手機端按 4 即可同步。"); else alert("⚠️ 上傳失敗，請檢查網路或 Token 權限。"); });
-    } else if (act === "4") {
-      fetch(apiUrl + "?t=" + Date.now(), { headers: hdrs }).then(r => r.json()).then(meta => {
-        if (!meta || !meta.content) { alert("⚠️ 雲端尚無收藏紀錄，請先在電腦按 3 上傳。"); return; }
-        const txt = decodeURIComponent(escape(atob(meta.content.replace(/\s/g, ""))));
-        const obj = JSON.parse(txt);
-        Object.keys(obj).forEach(k => localStorage.setItem(k, obj[k]));
-        alert("☁️ 已成功從雲端同步最新收藏！即將重新整理。");
-        location.reload();
-      }).catch(() => alert("⚠️ 讀取雲端收藏失敗。"));
-    }
-  }
-}
-const bakBtn = document.getElementById("ltx-fav-bak-btn"); if (bakBtn) { bakBtn.addEventListener("click", function() { openCloudFavMenu("片庫目錄"); }); }
 });
 </script>
 </body>
