@@ -368,6 +368,17 @@ fetch("cat_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() 
     background: #2563eb;
     color: #ffffff;
     border-color: #3b82f6;
+}
+.ltx-fav-btn {
+    margin-left: auto;
+    background: #1e2433;
+    color: #fbbf24;
+    border: 1px solid #3b445e;
+}
+.ltx-fav-btn:hover {
+    background: #d97706;
+    color: #ffffff;
+    border-color: #f59e0b;
 }</style>
 <script>(function(){
     function initBar(){
@@ -413,6 +424,65 @@ fetch("cat_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() 
             };
             bar.appendChild(b);
         });
+
+        var favBtn = document.createElement('button');
+        favBtn.type = 'button';
+        favBtn.className = 'ltx-sbtn ltx-fav-btn';
+        favBtn.textContent = '💾 收藏備份';
+        favBtn.onclick = async function(){
+            var choice = prompt("💾 收藏備份與跨裝置雲端同步（請輸入數字）：\n1. 複製本機收藏代碼（備份）\n2. 貼上代碼還原收藏\n3. ☁️ 上傳本機收藏至雲端（手機/電腦同步）\n4. ☁️ 從雲端拉取覆蓋本機收藏");
+            if (!choice) return;
+            var favData = {};
+            for (var k = 0; k < localStorage.length; k++) {
+                var key = localStorage.key(k);
+                if (key && (key.indexOf('fav') !== -1 || key.indexOf('like') !== -1 || key.indexOf('watch') !== -1)) {
+                    favData[key] = localStorage.getItem(key);
+                }
+            }
+            if (choice === '1') {
+                var code = btoa(unescape(encodeURIComponent(JSON.stringify(favData))));
+                try { await navigator.clipboard.writeText(code); alert("✅ 已複製收藏備份代碼至剪貼簿！"); }
+                catch(e) { prompt("請手動全選複製以下備份代碼：", code); }
+            } else if (choice === '2') {
+                var inp = prompt("請貼上收藏備份代碼：");
+                if (!inp) return;
+                try {
+                    var parsed = JSON.parse(decodeURIComponent(escape(atob(inp.trim()))));
+                    for (var pk in parsed) localStorage.setItem(pk, parsed[pk]);
+                    alert("✅ 還原成功！即將重新整理頁面。");
+                    location.reload();
+                } catch(e) { alert("❌ 代碼格式無效！"); }
+            } else if (choice === '3' || choice === '4') {
+                var tok = localStorage.getItem('ltx_gh_token');
+                if (!tok) {
+                    tok = prompt("首次使用雲端同步，請輸入 GitHub Token（僅存於本機瀏覽器）：");
+                    if (!tok) return;
+                    localStorage.setItem('ltx_gh_token', tok.trim());
+                }
+                var apiUrl = atob("aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy8=") + "javidiot/ltx-gif-wall/contents/data/fav_cloud_sync.json";
+                var headers = { "Authorization": "token " + tok.trim(), "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" };
+                try {
+                    var getRes = await fetch(apiUrl + "?t=" + Date.now(), { headers: headers });
+                    var meta = getRes.ok ? await getRes.json() : null;
+                    if (choice === '3') {
+                        var contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify({ updated: new Date().toISOString(), data: favData }, null, 2))));
+                        var body = { message: "Sync favorites", content: contentB64 };
+                        if (meta && meta.sha) body.sha = meta.sha;
+                        var putRes = await fetch(apiUrl, { method: "PUT", headers: headers, body: JSON.stringify(body) });
+                        if (putRes.ok) alert("✅ 已成功上傳收藏至雲端！");
+                        else { localStorage.removeItem('ltx_gh_token'); alert("❌ 上傳失敗（Token 無效或權限不足，已清除重設）。"); }
+                    } else {
+                        if (!meta || !meta.content) { alert("⚠️ 雲端尚無備份紀錄！"); return; }
+                        var remoteObj = JSON.parse(decodeURIComponent(escape(atob(meta.content.replace(/\s/g, '')))));
+                        var rData = remoteObj.data || {};
+                        for (var rk in rData) localStorage.setItem(rk, rData[rk]);
+                        alert("✅ 已從雲端拉取最新收藏（更新時間：" + (remoteObj.updated || '') + "），即將重新整理！");
+                        location.reload();
+                    }
+                } catch(err) { alert("❌ 網路或 API 連線異常：" + err.message); }
+            }
+        };
+        bar.appendChild(favBtn);
         hw.appendChild(bar);
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initBar);
