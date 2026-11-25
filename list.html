@@ -344,3 +344,77 @@ fetch("cat_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() 
 }).catch(function(){});
 </script>
 
+<style id="ltx-sort-style">#ltx-sort-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: rgba(13, 16, 23, 0.92);
+    border-bottom: 1px solid #222736;
+}
+.ltx-sbtn {
+    background: #1a1f2c;
+    color: #d1d5db;
+    border: 1px solid #2e364a;
+    border-radius: 99px;
+    padding: 4px 11px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+}
+.ltx-sbtn:hover, .ltx-sbtn.active {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #3b82f6;
+}</style>
+<script>(function(){
+    function initBar(){
+        if (document.getElementById('ltx-sort-bar')) return;
+        var hw = document.querySelector('.header-wrap');
+        if (!hw) return;
+        var bar = document.createElement('div');
+        bar.id = 'ltx-sort-bar';
+        var opts = [
+            { k: 'date_desc', t: '日期(倒序)' },
+            { k: 'date_asc',  t: '日期(順序)' },
+            { k: 'act_asc',   t: '名字(A-Z)' },
+            { k: 'act_desc',  t: '名字(Z-A)' },
+            { k: 'code_asc',  t: '番號(A-Z)' },
+            { k: 'code_desc', t: '番號(Z-A)' },
+            { k: 'rnd',       t: '隨機' }
+        ];
+        opts.forEach(function(o){
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'ltx-sbtn' + (o.k === 'date_desc' ? ' active' : '');
+            b.textContent = o.t;
+            b.onclick = function(){
+                var all = bar.querySelectorAll('.ltx-sbtn');
+                for (var i = 0; i < all.length; i++) all[i].classList.remove('active');
+                b.classList.add('active');
+                window._ltxCustomSort = true;
+                if (typeof LIST !== 'undefined' && Array.isArray(LIST)) {
+                    if (o.k === 'date_desc') LIST.sort(function(a,b){ return String(b.u||'').localeCompare(String(a.u||'')); });
+                    else if (o.k === 'date_asc') LIST.sort(function(a,b){ return String(a.u||'').localeCompare(String(b.u||'')); });
+                    else if (o.k === 'act_asc') LIST.sort(function(a,b){ return String(a.a||'zzz').localeCompare(String(b.a||'zzz')); });
+                    else if (o.k === 'act_desc') LIST.sort(function(a,b){ return String(b.a||'').localeCompare(String(a.a||'')); });
+                    else if (o.k === 'code_asc') LIST.sort(function(a,b){ return String(a.c||'').localeCompare(String(b.c||'')); });
+                    else if (o.k === 'code_desc') LIST.sort(function(a,b){ return String(b.c||'').localeCompare(String(a.c||'')); });
+                    else if (o.k === 'rnd') {
+                        for (var j = LIST.length - 1; j > 0; j--) {
+                            var r = Math.floor(Math.random() * (j + 1));
+                            var tmp = LIST[j]; LIST[j] = LIST[r]; LIST[r] = tmp;
+                        }
+                    }
+                    if (typeof runFilter === 'function') runFilter();
+                }
+            };
+            bar.appendChild(b);
+        });
+        hw.appendChild(bar);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initBar);
+    else initBar();
+})();</script>
