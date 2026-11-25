@@ -198,7 +198,7 @@ window.addEventListener("load", function() {
           const pa = parseT(String(ia.title || "")), pb = parseT(String(ib.title || ""));
           if (m === "date-desc") return (ib.date === "unknown date" ? "0000" : ib.date).localeCompare(ia.date === "unknown date" ? "0000" : ia.date) || ia._oi - ib._oi;
           if (m === "date-asc") return (ia.date === "unknown date" ? "0000" : ia.date).localeCompare(ib.date === "unknown date" ? "0000" : ib.date) || ib._oi - ia._oi;
-          if (m === "name-asc" || m === "name-desc") { if (!pa.act && !pb.act) return ia._oi - ib._oi; if (!pa.act) return 1; if (!pb.act) return -1; const c = pa.act.localeCompare(pb.act, "ja"); return m === "name-asc" ? c : -c; }
+          if (m === "name-asc" || m === "name-desc") { if (!pa.act && !pb.act) return ia._oi - ib._oi; if (!pa.act) return 1; if (!pb.act) return -1; const ea = (pa.act.match(/[A-Za-z][A-Za-z\s.'-]+/) || [""])[0].trim(), eb = (pb.act.match(/[A-Za-z][A-Za-z\s.'-]+/) || [""])[0].trim(); const c = (ea && eb) ? ea.localeCompare(eb, "en", { sensitivity: "base" }) : (ea ? -1 : (eb ? 1 : pa.act.localeCompare(pb.act, "ja"))); return m === "name-asc" ? c : -c; }
           if (m === "code-asc" || m === "code-desc") { if (!pa.cd && !pb.cd) return ia._oi - ib._oi; if (!pa.cd) return 1; if (!pb.cd) return -1; const c = pa.cd.localeCompare(pb.cd, "en", { numeric: true }); return m === "code-asc" ? c : -c; }
           return ia._oi - ib._oi;
         });
