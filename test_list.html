@@ -463,8 +463,8 @@ fetch("cat_data.json?t=" + Date.now()).then(function(r){ return r.ok ? r.json() 
     btn.style.cssText = 'background:#1e3a8a;color:#93c5fd;border-color:#3b82f6;margin-left:6px;';
     btn.textContent = '❓ 新手懶人包';
     if(bar.id === 'ltx-sort-bar'){ bar.appendChild(btn); } else {
-      btn.style.cssText = 'position:fixed;bottom:16px;right:16px;z-index:9999;background:#1e3a8a;color:#fff;border:1px solid #60a5fa;border-radius:99px;padding:8px 14px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.6);';
-      document.body.appendChild(btn);
+      btn.style.cssText = 'background:#1e3a8a;color:#93c5fd;border:1px solid #3b82f6;border-radius:8px;padding:5px 10px;font-weight:700;cursor:pointer;margin-bottom:8px;'; var topAnchor = document.querySelector('h1, .top-bar, header, body'); if (topAnchor && topAnchor.parentNode) { topAnchor.parentNode.insertBefore(btn, topAnchor); } else { document.body.insertBefore(btn, document.body.firstChild); }
+      
     }
     var modal = document.createElement('div');
     modal.id = 'ltx-help-modal';
